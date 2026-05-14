@@ -8927,27 +8927,83 @@
         'forest': 'level_3_sr_3_1_to_3_9'
       };
 
-      function shuffleQuestionsIntelligently(questions) {
+            function shuffleQuestionsIntelligently(questions) {
         const shuffled = [...questions];
-        const result = [];
-        const used = new Set();
-        let currentIndex = Math.floor(Math.random() * shuffled.length);
-        result.push(shuffled[currentIndex]);
-        used.add(currentIndex);
-        while (result.length < 10) {
-          let nextIndex;
-          let attempts = 0;
-          do {
-            nextIndex = Math.floor(Math.random() * shuffled.length);
-            attempts++;
-          } while (used.has(nextIndex) && attempts < 20);
-          if (!used.has(nextIndex)) {
-            result.push(shuffled[nextIndex]);
-            used.add(nextIndex);
+        
+        // Fisher-Yates 셔플 알고리즘
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
+        // ← 중복 제거 로직 추가
+        const selected = [];
+        const usedVerbs = new Set();
+        
+        for (const question of shuffled) {
+          if (selected.length >= 10) break;
+          
+          // 질문에서 핵심 단어/동사 추출
+          const keywords = extractKeywords(question.question, question.correct);
+          
+          // 이미 사용된 키워드가 있는지 확인
+          const hasConflict = keywords.some(keyword => usedVerbs.has(keyword));
+          
+          if (!hasConflict) {
+            selected.push(question);
+            keywords.forEach(keyword => usedVerbs.add(keyword));
           }
         }
-        return result;
+        
+        // 10개를 채우지 못했으면 중복 허용 (데이터 부족 시)
+        if (selected.length < 10) {
+          for (const question of shuffled) {
+            if (selected.length >= 10) break;
+            if (!selected.includes(question)) {
+              selected.push(question);
+            }
+          }
+        }
+        
+        return selected.slice(0, 10);
       }
+
+      function extractKeywords(question, correctAnswer) {
+        const keywords = [];
+        
+        // 정답에서 핵심 단어 추출
+        const correctWords = correctAnswer.toLowerCase().split(/\s+/);
+        correctWords.forEach(word => {
+          if (word.length > 2) {
+            // 동사의 원형 추출 (s, ed, ing 제거)
+            let baseWord = word
+              .replace(/s$/, '') // jumps → jump
+              .replace(/ed$/, '') // played → play
+              .replace(/ing$/, ''); // jumping → jump
+            keywords.push(baseWord);
+          }
+        });
+        
+        // 질문에서도 핵심 단어 추출
+        const questionWords = question.toLowerCase().split(/\s+/);
+        questionWords.forEach(word => {
+          if (word.length > 3 && !word.includes('_')) {
+            let baseWord = word
+              .replace(/[?.,;:!]$/, '') // 구두점 제거
+              .replace(/s$/, '')
+              .replace(/ed$/, '')
+              .replace(/ing$/, '');
+            
+            // 너무 일반적인 단어는 제외
+            if (!['the', 'one', 'many', 'what', 'does', 'mean'].includes(baseWord)) {
+              keywords.push(baseWord);
+            }
+          }
+        });
+        
+        return [...new Set(keywords)]; // 중복 제거
+      }
+
 
       function updateCoinBar() {
         const maxCoins = 50;
