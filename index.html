@@ -786,53 +786,35 @@
       }
     }
   </style> 
-    <script>
-      // ← Firebase 설정  
-   const firebaseConfig = {
-  apiKey: "AIzaSyBVFs5UBvz2O04RfqJU0OKRTQKpgY62qpU",
-  authDomain: "channy-quest.firebaseapp.com",
-  databaseURL: "https://channy-quest-default-rtdb.firebaseio.com",
-  projectId: "channy-quest",
-  storageBucket: "channy-quest.firebasestorage.app",
-  messagingSenderId: "432612710952",
-  appId: "1:432612710952:web:5bdbbb93e6d1599334331d",
-  measurementId: "G-PHZJ79NNJ0"
-};
 
-      // Firebase 초기화
-      firebase.initializeApp(firebaseConfig);
-      const database = firebase.database();
-    </script>
+  
+<script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-database.js"></script>
 
+<script>
+  // 전역 변수로 선언
+  let database;
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBVFs5UBvz2O04RfqJU0OKRTQKpgY62qpU",
+    authDomain: "channy-quest.firebaseapp.com",
+    databaseURL: "https://channy-quest-default-rtdb.firebaseio.com",
+    projectId: "channy-quest",
+    storageBucket: "channy-quest.firebasestorage.app",
+    messagingSenderId: "432612710952",
+    appId: "1:432612710952:web:5bdbbb93e6d1599334331d",
+    measurementId: "G-PHZJ79NNJ0"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  database = firebase.database();  // ← 전역 변수에 할당
+</script>
 
 </head>
 
 <body>
 
-  
-<script>
-  let database;
-</script>
-
-  
-<script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-database.js"></script>
-  
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBVFs5UBvz2O04RfqJU0OKRTQKpgY62qpU",
-      authDomain: "channy-quest.firebaseapp.com",
-      databaseURL: "https://channy-quest-default-rtdb.firebaseio.com",
-      projectId: "channy-quest",
-      storageBucket: "channy-quest.firebasestorage.app",
-      messagingSenderId: "432612710952",
-      appId: "1:432612710952:web:5bdbbb93e6d1599334331d",
-      measurementId: "G-PHZJ79NNJ0"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-  </script>
+   
   
   <div class="game-container">
     <div class="header">
