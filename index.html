@@ -1087,97 +1087,113 @@
       }
 
       function checkAnswer(selected, correct, button) {
-        if (gameState.answered) return;
-        gameState.answered = true;
-        const isCorrect = selected === correct;
-        if (isCorrect) {
-          gameState.score++;
-          button.classList.add('correct');
-          document.getElementById('feedback').textContent = '✓ Correct. Great job';
-          document.getElementById('feedback').style.color = '#4caf50';
-          playSound('correct');
-          gameState.sessionCoins += coinRewards[gameState.difficulty].correct;
-          for (let i = 0; i < 5; i++) {
-            setTimeout(() => {
-              updateCoinBar();
-            }, i * 60);
-          }
-        } else {
-          button.classList.add('wrong');
-          document.getElementById('feedback').textContent = `✗ Not quite. The answer is: ${correct}`;
-          document.getElementById('feedback').style.color = '#d32f2f';
-          playSound('wrong');
-          gameState.mistakes.push({
-            question: gameState.questionData.question,
-            correct: correct,
-            yourAnswer: selected
-          });
-        }
-        document.getElementById('totalCoins').textContent = gameState.sessionCoins;
-        document.getElementById('passBtn').style.display = 'none';
-        setTimeout(() => {
-          gameState.currentQuestion++;
-          loadQuestion();
-        }, 1500);
-      }
+  if (gameState.answered) return;
+  gameState.answered = true;
+  const isCorrect = selected === correct;
+  
+  if (isCorrect) {
+    gameState.score++;
+    button.classList.add('correct');
+    document.getElementById('feedback').textContent = '✓ Correct. Great job';
+    document.getElementById('feedback').style.color = '#4caf50';
+    playSound('correct');
+    gameState.sessionCoins += coinRewards[gameState.difficulty].correct;
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        updateCoinBar();
+      }, i * 60);
+    }
+    
+    // ✅ 정답이면 1초 후 자동으로 다음 문제로
+    setTimeout(() => {
+      gameState.currentQuestion++;
+      loadQuestion();
+    }, 1000);
+  } else {
+    button.classList.add('wrong');
+    document.getElementById('feedback').textContent = `✗ Not quite. The answer is: ${correct}`;
+    document.getElementById('feedback').style.color = '#d32f2f';
+    playSound('wrong');
+    gameState.mistakes.push({
+      question: gameState.questionData.question,
+      correct: correct,
+      yourAnswer: selected
+    });
+    
+    // ❌ 오답이면 1.5초 후 자동으로 다음 문제로
+    setTimeout(() => {
+      gameState.currentQuestion++;
+      loadQuestion();
+    }, 1500);
+  }
+  
+  document.getElementById('totalCoins').textContent = gameState.sessionCoins;
+  document.getElementById('passBtn').style.display = 'none';
+}
 
       function playSound(type) {
-        try {
-          const ctx = new(window.AudioContext || window.webkitAudioContext)();
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    if (type === 'correct') {
+      // ✅ 정답: 경쾌한 "도레미" 소리
+      const notes = [523, 659, 784]; // C5, E5, G5 (도, 미, 솔)
+      notes.forEach((freq, i) => {
+        setTimeout(() => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
           osc.connect(gain);
-          gain.connect(ctx.destination);
-          if (type === 'correct') {
-            const notes = [800, 1000, 1200];
-            notes.forEach((freq, i) => {
-              setTimeout(() => {
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.15);
-              }, i * 150);
-            });
-          } else {
-            const notes = [400, 300];
-            notes.forEach((freq, i) => {
-              setTimeout(() => {
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.2);
-              }, i * 200);
-            });
-          }
-        } catch (error) {
-          console.log('Audio context error');
-        }
-      }
+          gain.connect(audioContext.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+          
+          osc.start(audioContext.currentTime);
+          osc.stop(audioContext.currentTime + 0.2);
+        }, i * 100);
+      });
+    } else if (type === 'wrong') {
+      // ❌ 오답: 낮은 음
+      const notes = [349, 294]; // F4, D4 (파, 레)
+      notes.forEach((freq, i) => {
+        setTimeout(() => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+          
+          osc.start(audioContext.currentTime);
+          osc.stop(audioContext.currentTime + 0.25);
+        }, i * 125);
+      });
+    }
+  } catch (error) {
+    console.log('Audio not supported');
+  }
+}
 
-      function playAudio() {
-        let text = gameState.questionData.question;
-        text = text.replace(/_+/g, 'blank');
-        try {
-          const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(text)}&tl=en-US`;
-          const audio = new Audio(url);
-          audio.crossOrigin = "anonymous";
-          audio.play().catch(() => speakWithWebSpeech(text));
-        } catch (error) {
-          speakWithWebSpeech(text);
-        }
-      }
 
-      function speakWithWebSpeech(text) {
-        window.speechSynthesis.cancel();
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'en-US';
-        utt.rate = 0.9;
-        utt.pitch = 1.0;
-        utt.volume = 1.0;
-        window.speechSynthesis.speak(utt);
-      }
+function playAudio() {
+  let text = gameState.questionData.question;
+  text = text.replace(/_+/g, 'blank');
+  
+  // Web Speech API 사용 (더 안정적)
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = 1.0; 
+  utterance.pitch = 1.0;
+  utterance.volume = 1.0;
+  
+  window.speechSynthesis.cancel(); // 이전 음성 중지
+  window.speechSynthesis.speak(utterance);
+}
 
       function passQuestion() {
         if (gameState.answered) return;
