@@ -1359,81 +1359,89 @@ function checkAnswer(selected, correct, button) {
       }
 
       function showReview() {
-        document.getElementById('endScreen').classList.remove('active');
-        document.getElementById('reviewScreen').classList.add('active');
-        document.getElementById('homeBtn').style.display = 'block';
-        document.getElementById('closeBtn').style.display = 'block';
-        displayReviewPage(0);
-      }
+    document.getElementById('endScreen').classList.remove('active');
+    document.getElementById('reviewScreen').classList.add('active');
+    document.getElementById('homeBtn').style.display = 'block';
+    document.getElementById('closeBtn').style.display = 'block';
+    displayReviewPage(0);
+}
 
-      function displayReviewPage(page) {
-        gameState.currentPage = page;
-        const start = page * gameState.itemsPerPage;
-        const end = start + gameState.itemsPerPage;
-        const pageItems = gameState.mistakes.slice(start, end);
-        const reviewItems = document.getElementById('reviewItems');
-        reviewItems.innerHTML = '';
-        if (pageItems.length === 0) {
-          reviewItems.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No mistakes to review</p>';
-        } else {
-          pageItems.forEach((mistake, index) => {
+function displayReviewPage(page) {
+    gameState.currentPage = page;
+    const start = page * gameState.itemsPerPage;
+    const end = start + gameState.itemsPerPage;
+    const pageItems = gameState.mistakes.slice(start, end);
+    const reviewItems = document.getElementById('reviewItems');
+    reviewItems.innerHTML = '';
+    
+    if (pageItems.length === 0) {
+        reviewItems.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No mistakes to review</p>';
+    } else {
+        pageItems.forEach((mistake, index) => {
             const item = document.createElement('div');
             item.className = 'review-item';
             item.innerHTML = `
-            <div class="review-item-question"><strong>Q${start + index + 1}:</strong> ${mistake.question}</div>
-            <div class="review-item-answer">Your answer: <span style="color:#d32f2f;">${mistake.yourAnswer}</span></div>
-            <div class="review-item-answer">Correct answer: <span style="color:#4caf50;">${mistake.correct}</span></div>
-          `;
+                <div class="review-item-question"><strong>Q${start + index + 1}:</strong> ${mistake.question}</div>
+                <div class="review-item-answer">Your answer: <span style="color:#d32f2f;">${mistake.yourAnswer}</span></div>
+                <div class="review-item-answer">Correct answer: <span style="color:#4caf50;">${mistake.correct}</span></div>
+            `;
             reviewItems.appendChild(item);
-          });
-        }
-        const totalPages = Math.ceil(gameState.mistakes.length / gameState.itemsPerPage);
-        const pagination = document.getElementById('pagination');
-        pagination.innerHTML = '';
-        for (let i = 0; i < totalPages; i++) {
-          const btn = document.createElement('button');
-          btn.className = 'page-btn' + (i === page ? ' active' : '');
-          btn.textContent = i + 1;
-          btn.onclick = () => displayReviewPage(i);
-          pagination.appendChild(btn);
-        }
-      }
+        });
+    }
+    
+    const totalPages = Math.ceil(gameState.mistakes.length / gameState.itemsPerPage);
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    
+    for (let i = 0; i < totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (i === page ? ' active' : '');
+        btn.textContent = i + 1;
+        btn.onclick = () => displayReviewPage(i);
+        pagination.appendChild(btn);
+    }
+}
 
-      function playAgain() {
-        document.getElementById('endScreen').classList.remove('active');
-        document.getElementById('reviewScreen').classList.remove('active');
-        document.getElementById('scoreBoard').classList.remove('active');
-        gameState.currentQuestion = 0;
-        gameState.score = 0;
-        gameState.mistakes = [];
-        gameState.currentPage = 0;
-        gameState.gameInProgress = true;
-        const levelKey = difficultyMap[gameState.difficulty];
-        const allQuestions = questionData[levelKey];
-        gameState.shuffledQuestions = shuffleQuestionsIntelligently(allQuestions); // ← 매번 새로 셔플
-        document.getElementById('startScreen').classList.add('hidden');
-        document.getElementById('gameArea').classList.add('active');
-        document.getElementById('homeBtn').style.display = 'block';
-        document.getElementById('closeBtn').style.display = 'block';
-        loadQuestion();
-      }
+function playAgain() {
+    document.getElementById('endScreen').classList.remove('active');
+    document.getElementById('reviewScreen').classList.remove('active');
+    document.getElementById('scoreBoard').classList.remove('active');
+    gameState.currentQuestion = 0;
+    gameState.score = 0;
+    gameState.mistakes = [];
+    gameState.currentPage = 0;
+    gameState.gameInProgress = true;
+    
+    const levelKey = difficultyMap[gameState.difficulty];
+    const allQuestions = questionData[levelKey];
+    gameState.shuffledQuestions = shuffleQuestionsIntelligently(allQuestions);
+    
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('gameArea').classList.add('active');
+    document.getElementById('homeBtn').style.display = 'block';
+    document.getElementById('closeBtn').style.display = 'block';
+    
+    loadQuestion();
+}
 
-      function goHome() {
-        gameState.gameInProgress = false;
-        gameState.sessionCoins = 0;
-        document.getElementById('totalCoins').textContent = '0';
-        const fill = document.getElementById('coinBarFill');
-        fill.style.width = '0%';
-        document.getElementById('startScreen').classList.remove('hidden');
-        document.getElementById('gameArea').classList.remove('active');
-        document.getElementById('endScreen').classList.remove('active');
-        document.getElementById('reviewScreen').classList.remove('active');
-        document.getElementById('scoreBoard').classList.remove('active');
-        document.getElementById('homeBtn').style.display = 'none';
-        document.getElementById('closeBtn').style.display = 'none';
-      }
+function goHome() {
+    gameState.gameInProgress = false;
+    gameState.sessionCoins = 0;
+    document.getElementById('totalCoins').textContent = '0';
+    const fill = document.getElementById('coinBarFill');
+    fill.style.width = '0%';
+    
+    document.getElementById('startScreen').classList.remove('hidden');
+    document.getElementById('gameArea').classList.remove('active');
+    document.getElementById('endScreen').classList.remove('active');
+    document.getElementById('reviewScreen').classList.remove('active');
+    document.getElementById('scoreBoard').classList.remove('active');
+    document.getElementById('homeBtn').style.display = 'none';
+    document.getElementById('closeBtn').style.display = 'none';
+}
 
-      document.getElementById('totalCoins').textContent = '0';
+document.getElementById('totalCoins').textContent = '0';
+
     </script>
   </div>
 </body>
