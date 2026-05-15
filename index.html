@@ -1180,38 +1180,55 @@ function checkAnswer(selected, correct, button) {
 }
 
 
-function playAudio() {
-  let text = gameState.questionData.question;
-  text = text.replace(/_+/g, 'blank');
-  
-  // Web Speech API 사용 (더 안정적)
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-US';
-  utterance.rate = 0.8;  // 0.8배 속도 (더 천천히)
-  utterance.pitch = 1.0;
-  utterance.volume = 1.0;
-  
-  window.speechSynthesis.cancel(); // 이전 음성 중지
-  window.speechSynthesis.speak(utterance);
-}
-
-      function passQuestion() {
-        if (gameState.answered) return;
-        gameState.answered = true;
-        const q = gameState.questionData;
-        gameState.mistakes.push({
-          question: gameState.questionData.question,
-          correct: q.correct,
-          yourAnswer: 'PASSED'
-        });
-        document.getElementById('feedback').textContent = '⏭️ Passed - Next question';
-        document.getElementById('feedback').style.color = '#ff9800';
-        playSound('wrong');
-        setTimeout(() => {
-          gameState.currentQuestion++;
-          loadQuestion();
-        }, 1500);
+ function playAudio() {
+      let text = gameState.questionData.question;
+      text = text.replace(/_+/g, 'blank');
+      
+      try {
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(text)}&tl=en-US`;
+        const audio = new Audio(url);
+        audio.crossOrigin = "anonymous";
+        
+        audio.play().catch(() => speakWithWebSpeech(text));
+      } catch (error) {
+        speakWithWebSpeech(text);
       }
+    }
+
+    function speakWithWebSpeech(text) {
+      window.speechSynthesis.cancel();
+      
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = 0.9;
+      utt.pitch = 1.0;
+      utt.volume = 1.0;
+      
+      window.speechSynthesis.speak(utt);
+    }
+
+    function passQuestion() {
+      if (gameState.answered) return;
+
+      gameState.answered = true;
+      const q = gameState.questionData;
+      
+      gameState.mistakes.push({
+        question: gameState.questionData.question,
+        correct: q.correct,
+        yourAnswer: 'PASSED'
+      });
+
+      document.getElementById('feedback').textContent = '⏭️ Passed - Next question';
+      document.getElementById('feedback').style.color = '#ff9800';
+
+      playSound('wrong');
+
+      setTimeout(() => {
+        gameState.currentQuestion++;
+        loadQuestion();
+      }, 1500);
+    }
 
       function confirmGoHome() {
         if (confirm('Are you sure you want to go home? Your progress will be lost.')) {
