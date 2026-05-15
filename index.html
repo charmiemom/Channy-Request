@@ -5,806 +5,222 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Channy's English Quest</title>
 
-  <!-- Firebase SDK (단 한 번만!) -->
   <script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-database.js"></script>
   
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #a8e6cf 0%, #ffd3b6 50%, #ffaaa5 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
     }
-
     .game-container {
       background: linear-gradient(to bottom, #f0f4e8, #e8f1f5);
-      border-radius: 25px;
-      padding: 25px;
-      max-width: 800px;
-      width: 100%;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-      border: 5px solid #8b7355;
+      border-radius: 25px; padding: 25px; max-width: 800px; width: 100%;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2); border: 5px solid #8b7355;
     }
-
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      gap: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 30px; gap: 20px;
     }
-
-    .coin-display-container {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
+    .coin-display-container { display: flex; gap: 15px; align-items: center; }
     .total-coins {
-      font-size: 20px;
-      font-weight: bold;
-      color: #d4a435;
+      font-size: 20px; font-weight: bold; color: #d4a435;
       background: linear-gradient(135deg, #fef3c7, #fde68a);
-      padding: 12px 20px;
-      border-radius: 12px;
-      border: 3px solid #d4a435;
-      min-width: 120px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      white-space: nowrap;
+      padding: 12px 20px; border-radius: 12px; border: 3px solid #d4a435;
+      min-width: 120px; text-align: center;
     }
-
     .coin-bar-horizontal {
-      width: 200px;
-      height: 30px;
+      width: 200px; height: 30px;
       background: linear-gradient(to right, #f0e8d8, #e8dcc8);
-      border: 3px solid #d4a574;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.2);
+      border: 3px solid #d4a574; border-radius: 15px; overflow: hidden;
       position: relative;
     }
-
     .coin-bar-fill {
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 0%;
+      position: absolute; left: 0; top: 0; height: 100%; width: 0%;
       background: linear-gradient(to right, #ffd700, #ffed4e);
       transition: width 0.3s ease;
-      border-right: 2px solid #d4a435;
     }
-
-    .header-buttons {
-      display: flex;
-      gap: 10px;
-    }
-
+    .header-buttons { display: flex; gap: 10px; }
     button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: inherit;
+      padding: 10px 20px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: bold; cursor: pointer;
+      transition: all 0.3s; font-family: inherit;
     }
-
-    .home-btn,
-    .close-btn-header {
+    .home-btn, .close-btn-header {
       background: linear-gradient(135deg, #8b7355, #6b5344);
-      color: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-
-    .home-btn:hover,
-    .close-btn-header:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    .home-btn:hover, .close-btn-header:hover {
+      transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3);
     }
-
-    .screen {
-      display: none;
-      animation: fadeIn 0.4s ease-in;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .screen.hidden {
-      display: none;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    #startScreen {
-      text-align: center;
-    }
-
-    .title {
-      font-size: 48px;
-      font-weight: bold;
-      color: #6b5344;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .subtitle {
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 30px;
-    }
-
+    .screen { display: none; animation: fadeIn 0.4s ease-in; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    #startScreen { text-align: center; }
+    .title { font-size: 48px; font-weight: bold; color: #6b5344; margin-bottom: 20px; }
+    .subtitle { font-size: 18px; color: #666; margin-bottom: 30px; }
     .difficulty-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 15px;
-      margin-top: 30px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 15px; margin-top: 30px;
     }
-
     .difficulty-btn {
-      padding: 15px;
-      font-size: 16px;
-      font-weight: bold;
-      border: 3px solid transparent;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px; font-size: 16px; font-weight: bold;
+      border: 3px solid transparent; border-radius: 12px;
+      cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-
-    .difficulty-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .difficulty-btn.sprout {
-      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-      color: #2e7d32;
-      border-color: #66bb6a;
-    }
-
-    .difficulty-btn.sprout:hover {
-      background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
-    }
-
-    .difficulty-btn.seedling {
-      background: linear-gradient(135deg, #90ee90, #7fd67f);
-      color: #2d5016;
-    }
-
-    .difficulty-btn.seedling:hover {
-      background: linear-gradient(135deg, #7fd67f, #66bb6a);
-    }
-
-    .difficulty-btn.tree {
-      background: linear-gradient(135deg, #87ceeb, #6eb8d4);
-      color: #1a3a52;
-    }
-
-    .difficulty-btn.tree:hover {
-      background: linear-gradient(135deg, #6eb8d4, #5ba3c0);
-    }
-
-    .difficulty-btn.forest {
-      background: linear-gradient(135deg, #dda0dd, #d88cc8);
-      color: #4a2a4a;
-    }
-
-    .difficulty-btn.forest:hover {
-      background: linear-gradient(135deg, #d88cc8, #cc88bb);
-    }
-
-    #gameArea.active {
-      display: block;
-    }
-
+    .difficulty-btn:hover { transform: translateY(-3px); }
+    .difficulty-btn.sprout { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+    .difficulty-btn.seedling { background: linear-gradient(135deg, #90ee90, #7fd67f); color: #2d5016; }
+    .difficulty-btn.tree { background: linear-gradient(135deg, #87ceeb, #6eb8d4); color: #1a3a52; }
+    .difficulty-btn.forest { background: linear-gradient(135deg, #dda0dd, #d88cc8); color: #4a2a4a; }
+    
     .question-area {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      border: 3px solid #e0d5c7;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background: white; padding: 25px; border-radius: 15px;
+      margin-bottom: 20px; border: 3px solid #e0d5c7;
     }
-
-    .question-number {
-      font-size: 14px;
-      color: #999;
-      margin-bottom: 10px;
-    }
-
+    .question-number { font-size: 14px; color: #999; margin-bottom: 10px; }
     #questionText {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      line-height: 1.8;
-      min-height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 24px; font-weight: bold; color: #333; line-height: 1.8;
+      min-height: 80px; display: flex; align-items: center; justify-content: center;
     }
-
-    .blank-underline {
-      display: inline-block;
-      border-bottom: 3px solid #333;
-      min-width: 120px;
-      margin: 0 5px;
-      padding-bottom: 5px;
-      height: 20px;
-      vertical-align: baseline;
-    }
-
     .audio-btn {
       background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 15px;
-      transition: all 0.3s;
+      color: white; padding: 12px 25px; border: none;
+      border-radius: 10px; font-size: 16px; font-weight: bold;
+      cursor: pointer; margin-top: 15px; transition: all 0.3s;
     }
-
-    .audio-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .options-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
+    .options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
     .option-btn {
-      padding: 18px;
-      font-size: 18px;
-      font-weight: bold;
+      padding: 18px; font-size: 18px; font-weight: bold;
       background: linear-gradient(135deg, #f0e8d8, #e8dcc8);
-      border: 3px solid #d4a574;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-      color: #333;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 3px solid #d4a574; border-radius: 12px;
+      cursor: pointer; color: #333; transition: all 0.3s;
     }
-
-    .option-btn:hover:not(.correct):not(.wrong) {
-      background: linear-gradient(135deg, #f5f0e8, #ede5d8);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .option-btn.correct {
-      background: linear-gradient(135deg, #90ee90, #7fd67f);
-      border-color: #4caf50;
-      color: #2d5016;
-      animation: bounce 0.6s ease;
-    }
-
-    .option-btn.wrong {
-      background: linear-gradient(135deg, #ffb6b6, #ff9999);
-      border-color: #d32f2f;
-      color: #8b0000;
-      animation: shake 0.4s ease;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-
-    #feedback {
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      height: 25px;
-      margin-bottom: 15px;
-    }
-
+    .option-btn:hover:not(.correct):not(.wrong) { transform: translateY(-2px); }
+    .option-btn.correct { background: linear-gradient(135deg, #90ee90, #7fd67f); border-color: #4caf50; animation: bounce 0.6s ease; }
+    .option-btn.wrong { background: linear-gradient(135deg, #ffb6b6, #ff9999); border-color: #d32f2f; animation: shake 0.4s ease; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    
+    #feedback { font-size: 18px; font-weight: bold; text-align: center; height: 25px; margin-bottom: 15px; }
     .pass-btn {
-      padding: 12px 30px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 12px 30px; font-size: 16px; font-weight: bold;
       background: linear-gradient(135deg, #ff9800, #f57c00);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 10px;
-      width: 100%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      color: white; border: none; border-radius: 10px; cursor: pointer;
+      margin-top: 10px; width: 100%;
     }
-
-    .pass-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    #endScreen.active {
-      display: block;
-    }
-
-    .end-message {
-      font-size: 32px;
-      font-weight: bold;
-      color: #6b5344;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .final-score {
-      font-size: 48px;
-      font-weight: bold;
-      color: #d4a435;
-      margin: 20px 0;
-      text-align: center;
-    }
-
+    
+    .end-message { font-size: 32px; font-weight: bold; color: #6b5344; margin-bottom: 20px; text-align: center; }
+    .final-score { font-size: 48px; font-weight: bold; color: #d4a435; margin: 20px 0; text-align: center; }
     .coins-earned {
-      font-size: 24px;
-      color: #8b6914;
+      font-size: 24px; color: #8b6914;
       background: linear-gradient(135deg, #fef3c7, #fde68a);
-      padding: 15px 25px;
-      border-radius: 12px;
-      margin: 20px 0;
-      border: 2px solid #d4a435;
-      text-align: center;
+      padding: 15px 25px; border-radius: 12px; margin: 20px 0;
+      border: 2px solid #d4a435; text-align: center;
     }
-
-    .end-buttons {
-      display: flex;
-      gap: 15px;
-      margin-top: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
+    .end-buttons { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap; }
     .end-btn {
-      padding: 15px 30px;
-      font-size: 18px;
-      font-weight: bold;
+      padding: 15px 30px; font-size: 18px; font-weight: bold;
       background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
+      color: white; border: none; border-radius: 12px; cursor: pointer;
     }
-
-    .end-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .review-btn {
-      background: linear-gradient(135deg, #2196F3, #0b7dda);
-    }
-
-    .menu-btn {
-      background: linear-gradient(135deg, #8b7355, #6b5344);
-    }
-
-    #reviewScreen.active {
-      display: block;
-    }
-
-    .review-title {
-      font-size: 28px;
-      font-weight: bold;
-      color: #6b5344;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .review-items {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      border: 3px solid #e0d5c7;
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-    }
-
-    .review-item {
-      background: linear-gradient(135deg, #f9f5f0, #f0ebe5);
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      border-left: 5px solid #d4a435;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .review-item-question {
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-
-    .review-item-answer {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 8px;
-    }
-
-    .review-pagination {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
+    .review-btn { background: linear-gradient(135deg, #2196F3, #0b7dda); }
+    .menu-btn { background: linear-gradient(135deg, #8b7355, #6b5344); }
+    
+    .review-title { font-size: 28px; font-weight: bold; color: #6b5344; margin-bottom: 20px; text-align: center; }
+    .review-items { background: white; border-radius: 15px; padding: 20px; border: 3px solid #e0d5c7; max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
+    .review-item { background: linear-gradient(135deg, #f9f5f0, #f0ebe5); padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid #d4a435; }
+    .review-item-question { font-weight: bold; color: #333; margin-bottom: 10px; font-size: 16px; }
+    .review-item-answer { font-size: 14px; color: #666; margin-bottom: 8px; }
+    .review-pagination { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
     .page-btn {
-      padding: 8px 15px;
-      background: linear-gradient(135deg, #8b7355, #6b5344);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
+      padding: 8px 15px; background: linear-gradient(135deg, #8b7355, #6b5344);
+      color: white; border: none; border-radius: 8px; cursor: pointer;
+      font-weight: bold; transition: all 0.3s;
     }
-
-    .page-btn:hover {
-      transform: scale(1.05);
-    }
-
-    .page-btn.active {
-      background: linear-gradient(135deg, #d4a435, #c49425);
-    }
-
-    #scoreBoard.active {
-      display: block;
-    }
-
+    .page-btn.active { background: linear-gradient(135deg, #d4a435, #c49425); }
+    
     .scoreboard-container {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      border: 5px solid #8b7355;
-      max-width: 600px;
-      margin: 0 auto;
+      background: white; padding: 30px; border-radius: 20px;
+      border: 5px solid #8b7355; max-width: 600px; margin: 0 auto;
     }
-
     .scoreboard-title {
-      font-size: 36px;
-      font-weight: bold;
-      color: #6b5344;
-      text-align: center;
-      margin-bottom: 25px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      font-size: 36px; font-weight: bold; color: #6b5344;
+      text-align: center; margin-bottom: 25px;
     }
-
     .current-score {
       background: linear-gradient(135deg, #fef3c7, #fde68a);
-      padding: 15px 20px;
-      border-radius: 12px;
-      border: 2px solid #d4a435;
-      margin-bottom: 20px;
-      text-align: center;
-      font-weight: bold;
-      color: #333;
-      line-height: 1.8;
+      padding: 15px 20px; border-radius: 12px; border: 2px solid #d4a435;
+      margin-bottom: 20px; text-align: center; font-weight: bold; color: #333;
     }
-
-    .name-input-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
+    .name-input-container { display: flex; gap: 10px; margin-bottom: 20px; }
     .name-input {
-      flex: 1;
-      padding: 12px 15px;
-      font-size: 16px;
-      border: 3px solid #d4a574;
-      border-radius: 10px;
-      font-family: inherit;
-      color: #333;
+      flex: 1; padding: 12px 15px; font-size: 16px;
+      border: 3px solid #d4a574; border-radius: 10px; font-family: inherit;
     }
-
-    .name-input:focus {
-      outline: none;
-      border-color: #8b7355;
-      box-shadow: 0 0 8px rgba(139, 115, 85, 0.3);
-    }
-
     .save-score-btn {
-      padding: 12px 25px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 12px 25px; font-size: 16px; font-weight: bold;
       background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-      white-space: nowrap;
+      color: white; border: none; border-radius: 10px; cursor: pointer; white-space: nowrap;
     }
-
-    .save-score-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
+    
     .ranking-container {
-      background: #f9f5f0;
-      padding: 20px;
-      border-radius: 15px;
-      border: 2px solid #e0d5c7;
-      margin-bottom: 20px;
+      background: #f9f5f0; padding: 20px; border-radius: 15px;
+      border: 2px solid #e0d5c7; margin-bottom: 20px;
     }
-
-    .ranking-title {
-      font-size: 20px;
-      font-weight: bold;
-      color: #6b5344;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .ranking-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
+    .ranking-title { font-size: 20px; font-weight: bold; color: #6b5344; margin-bottom: 15px; text-align: center; }
+    .ranking-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
     .ranking-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 15px;
-      background: white;
-      border-radius: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 15px; background: white; border-radius: 10px;
       border-left: 5px solid #d4a435;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-
-    .ranking-rank {
-      font-size: 18px;
-      font-weight: bold;
-      color: #d4a435;
-      min-width: 40px;
-    }
-
-    .ranking-rank.medal-1 {
-      color: #FFD700;
-      font-size: 20px;
-    }
-
-    .ranking-rank.medal-2 {
-      color: #C0C0C0;
-      font-size: 20px;
-    }
-
-    .ranking-rank.medal-3 {
-      color: #CD7F32;
-      font-size: 20px;
-    }
-
-    .ranking-info {
-      flex: 1;
-      margin: 0 15px;
-    }
-
-    .ranking-name {
-      font-weight: bold;
-      color: #333;
-      font-size: 16px;
-    }
-
-    .ranking-meta {
-      font-size: 12px;
-      color: #999;
-      margin-top: 3px;
-    }
-
-    .ranking-coins {
-      font-weight: bold;
-      color: #d4a435;
-      font-size: 16px;
-      min-width: 80px;
-      text-align: right;
-    }
-
-    .ranking-difficulty {
-      font-size: 12px;
-      color: #666;
-      background: #f0f0f0;
-      padding: 3px 8px;
-      border-radius: 5px;
-      margin-left: 10px;
-    }
-
-    .scoreboard-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .scoreboard-buttons button {
-      flex: 1;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
+    .ranking-rank { font-size: 18px; font-weight: bold; color: #d4a435; min-width: 40px; }
+    .ranking-rank.medal-1 { color: #FFD700; }
+    .ranking-rank.medal-2 { color: #C0C0C0; }
+    .ranking-rank.medal-3 { color: #CD7F32; }
+    .ranking-info { flex: 1; margin: 0 15px; }
+    .ranking-name { font-weight: bold; color: #333; font-size: 16px; }
+    .ranking-meta { font-size: 12px; color: #999; margin-top: 3px; }
+    .ranking-coins { font-weight: bold; color: #d4a435; font-size: 16px; min-width: 80px; text-align: right; }
+    .ranking-difficulty { font-size: 12px; color: #666; background: #f0f0f0; padding: 3px 8px; border-radius: 5px; margin-left: 10px; }
+    
+    .scoreboard-buttons { display: flex; gap: 10px; margin-top: 20px; }
+    .scoreboard-buttons button { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; }
+    
     @media (max-width: 600px) {
-      .difficulty-buttons {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .options-container {
-        grid-template-columns: 1fr;
-      }
-
-      .title {
-        font-size: 32px;
-      }
-
-      .end-buttons {
-        flex-direction: column;
-      }
-
-      .header {
-        flex-direction: column;
-      }
-
-      .scoreboard-container {
-        padding: 20px;
-      }
-
-      .scoreboard-title {
-        font-size: 28px;
-      }
-
-      .name-input-container {
-        flex-direction: column;
-      }
-
-      .save-score-btn {
-        width: 100%;
-      }
-    }
-
-    @media (max-height: 600px) and (orientation: landscape) {
-      .game-container {
-        padding: 15px;
-        max-width: 95vw;
-      }
-
-      .title {
-        font-size: 32px;
-        margin-bottom: 10px;
-      }
-
-      .difficulty-buttons {
-        gap: 10px;
-        margin-top: 15px;
-      }
-
-      .difficulty-btn {
-        padding: 12px;
-        font-size: 14px;
-      }
-
-      .header {
-        margin-bottom: 15px;
-        gap: 10px;
-      }
-
-      .coin-bar-horizontal {
-        width: 150px;
-        height: 25px;
-      }
-
-      .total-coins {
-        font-size: 16px;
-        padding: 8px 15px;
-        min-width: 100px;
-      }
-
-      .question-area {
-        padding: 15px;
-        margin-bottom: 12px;
-      }
-
-      #questionText {
-        font-size: 18px;
-        min-height: 50px;
-      }
-
-      .audio-btn {
-        padding: 8px 15px;
-        font-size: 14px;
-        margin-top: 10px;
-      }
-
-      .options-container {
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-
-      .option-btn {
-        padding: 12px;
-        font-size: 16px;
-      }
-
-      #feedback {
-        font-size: 14px;
-        height: 20px;
-        margin-bottom: 10px;
-      }
-
-      .blank-underline {
-        min-width: 70px;
-        border-bottom: 2px solid #333;
-      }
-
-      .pass-btn {
-        padding: 10px 20px;
-        font-size: 14px;
-        margin-top: 8px;
-      }
+      .difficulty-buttons { grid-template-columns: 1fr 1fr; }
+      .options-container { grid-template-columns: 1fr; }
+      .title { font-size: 32px; }
+      .end-buttons { flex-direction: column; }
+      .header { flex-direction: column; }
+      .name-input-container { flex-direction: column; }
+      .save-score-btn { width: 100%; }
     }
   </style>
 
   <script>
-    // ======== Firebase 초기화 (head에서 단 한 번만) ========
     let database;
-    
     const firebaseConfig = {
       apiKey: "AIzaSyBVFs5UBvz2O04RfqJU0OKRTQKpgY62qpU",
       authDomain: "channy-quest.firebaseapp.com",
-      databaseURL: "https://channy-quest-default-rtdb.firebaseio.com",
+      databaseURL: "https://channy-quest-default-rtdb.firebaseio.com",        
       projectId: "channy-quest",
       storageBucket: "channy-quest.firebasestorage.app",
       messagingSenderId: "432612710952",
       appId: "1:432612710952:web:5bdbbb93e6d1599334331d",
       measurementId: "G-PHZJ79NNJ0"
     };
-
     firebase.initializeApp(firebaseConfig);
     database = firebase.database();
-    console.log("✅ Firebase initialized successfully!");
+    
+    console.log("✅ Firebase initialized!");
+
   </script>
 </head>
 
@@ -827,18 +243,10 @@
       <div class="title">Channy's English Quest</div>
       <div class="subtitle">Choose your level</div>
       <div class="difficulty-buttons">
-        <button class="difficulty-btn sprout" onclick="startGame('sprout')">
-          🌱 Sprout<br><small style="font-size:12px;">SR 0.7-1.2</small>
-        </button>
-        <button class="difficulty-btn seedling" onclick="startGame('seedling')">
-          🌿 Seedling<br><small style="font-size:12px;">SR 1.3-2.2</small>
-        </button>
-        <button class="difficulty-btn tree" onclick="startGame('tree')">
-          🌳 Tree<br><small style="font-size:12px;">SR 2.3-3.0</small>
-        </button>
-        <button class="difficulty-btn forest" onclick="startGame('forest')">
-          🌲 Forest<br><small style="font-size:12px;">SR 3.1-3.9</small>
-        </button>
+        <button class="difficulty-btn sprout" onclick="startGame('sprout')">🌱 Sprout<br><small style="font-size:12px;">SR 0.7-1.2</small></button>
+        <button class="difficulty-btn seedling" onclick="startGame('seedling')">🌿 Seedling<br><small style="font-size:12px;">SR 1.3-2.2</small></button>
+        <button class="difficulty-btn tree" onclick="startGame('tree')">🌳 Tree<br><small style="font-size:12px;">SR 2.3-3.0</small></button>
+        <button class="difficulty-btn forest" onclick="startGame('forest')">🌲 Forest<br><small style="font-size:12px;">SR 3.1-3.9</small></button>
       </div>
     </div>
 
@@ -901,19 +309,10 @@
   </div>
 
   <script>
-    // ======== 게임 상태 및 설정 ========
     let gameState = {
-      currentQuestion: 0,
-      score: 0,
-      sessionCoins: 0,
-      difficulty: 'seedling',
-      answered: false,
-      questionData: null,
-      mistakes: [],
-      currentPage: 0,
-      itemsPerPage: 3,
-      gameInProgress: false,
-      shuffledQuestions: []
+      currentQuestion: 0, score: 0, sessionCoins: 0, difficulty: 'seedling',
+      answered: false, questionData: null, mistakes: [],
+      currentPage: 0, itemsPerPage: 3, gameInProgress: false, shuffledQuestions: []
     };
 
     const coinRewards = {
@@ -932,10 +331,312 @@
 
     const questionData = {
       "level_0_sr_0_7_to_1_2": [
-        {
-          "question": "One dog. Two _____?",
-          "correct": "dogs",
-          "options": ["doges", "dogs", "dog", "dogss"]
-        },
-        {
-          "question": "The<span class="cursor">█</span>
+        {"question": "One dog. Two _____?", "correct": "dogs", "options": ["doges", "dogs", "dog", "dogss"]},
+        {"question": "The girl _____ a book usually.", "correct": "reads", "options": ["not correct", "reads", "reading", "read"]},
+        {"question": "The duck _____ in the pond right now.", "correct": "is swimming", "options": ["is swimming", "swam", "swims", "swim"]},
+        {"question": "The boy _____ with a ball last night.", "correct": "played", "options": ["play", "playing", "plays", "played"]},
+        {"question": "The boy _____ with a ball currently.", "correct": "is playing", "options": ["played", "is playing", "plays", "play"]},
+        {"question": "One pig. Two _____?", "correct": "pigs", "options": ["pig", "pigs", "piges", "pigss"]},
+        {"question": "The dog _____ in the yard every day.", "correct": "runs", "options": ["ran", "runs", "run", "running"]},
+        {"question": "The dog _____ in the yard last night.", "correct": "ran", "options": ["running", "ran", "run", "runs"]},
+        {"question": "The frog _____ on a log currently.", "correct": "is jumping", "options": ["jumps", "jump", "jumped", "is jumping"]},
+        {"question": "The dog _____ in the yard at this moment.", "correct": "is running", "options": ["ran", "run", "runs", "is running"]}
+      ],
+      "level_1_sr_1_3_to_2_2": [
+        {"question": "She _____ to school by bus every day.", "correct": "goes", "options": ["go", "goes", "going", "went"]},
+        {"question": "They _____ a movie last night.", "correct": "watched", "options": ["watch", "watches", "watched", "watching"]},
+        {"question": "I _____ my homework right now.", "correct": "am doing", "options": ["do", "does", "am doing", "did"]},
+        {"question": "He _____ three languages fluently.", "correct": "speaks", "options": ["speak", "speaks", "speaking", "spoke"]},
+        {"question": "We _____ to the beach last summer.", "correct": "went", "options": ["go", "goes", "went", "going"]},
+        {"question": "The teacher _____ the lesson right now.", "correct": "is explaining", "options": ["explain", "explains", "is explaining", "explained"]},
+        {"question": "She _____ a beautiful dress to the party.", "correct": "wore", "options": ["wear", "wears", "wore", "wearing"]},
+        {"question": "They _____ lunch together every day.", "correct": "eat", "options": ["eat", "eats", "eating", "ate"]},
+        {"question": "I _____ this book already.", "correct": "have read", "options": ["read", "reads", "have read", "am reading"]},
+        {"question": "He _____ at the office all day tomorrow.", "correct": "will be", "options": ["is", "was", "will be", "have been"]}
+      ],
+      "level_2_sr_2_3_to_3_0": [
+        {"question": "If I _____ you, I would apologize immediately.", "correct": "were", "options": ["am", "was", "were", "have been"]},
+        {"question": "She suggested that we _____ earlier tomorrow.", "correct": "leave", "options": ["left", "leave", "leaves", "leaving"]},
+        {"question": "Despite _____ tired, he continued working.", "correct": "being", "options": ["be", "being", "been", "to be"]},
+        {"question": "The meeting _____ postponed until next week.", "correct": "has been", "options": ["has been", "have been", "is", "was"]},
+        {"question": "It's important that she _____ here on time.", "correct": "be", "options": ["is", "be", "was", "being"]},
+        {"question": "By next year, they _____ here for ten years.", "correct": "will have lived", "options": ["will live", "will have lived", "have lived", "are living"]},
+        {"question": "The report _____ completed by Friday without fail.", "correct": "must be", "options": ["must be", "must have been", "should be", "can be"]},
+        {"question": "He insists on _____ every detail explained.", "correct": "having", "options": ["have", "having", "has", "had"]},
+        {"question": "When I arrived, the concert _____ already begun.", "correct": "had", "options": ["has", "had", "have", "having"]},
+        {"question": "The strategy _____ agreed upon by all stakeholders.", "correct": "has been", "options": ["has been", "have been", "is", "will be"]}
+      ],
+      "level_3_sr_3_1_to_3_9": [
+        {"question": "The scientist's hypothesis _____ the anomaly in the data.", "correct": "elucidates", "options": ["elucidate", "elucidates", "elucidating", "elucidated"]},
+        {"question": "His obfuscation of facts only _____ the investigation.", "correct": "obfuscated", "options": ["obfuscate", "obfuscated", "obfuscates", "obfuscating"]},
+        {"question": "The inherent dichotomy _____ a fundamental paradox.", "correct": "presupposes", "options": ["presuppose", "presupposes", "presupposing", "presupposed"]},
+        {"question": "Her perspicacious observations _____ the underlying mechanisms.", "correct": "delineated", "options": ["delineate", "delineated", "delineates", "delineating"]},
+        {"question": "The cacophony of voices _____ rational discourse.", "correct": "obviated", "options": ["obviate", "obviated", "obviates", "obviating"]},
+        {"question": "Such esoteric knowledge _____ the grasp of laypeople.", "correct": "transcends", "options": ["transcend", "transcends", "transcending", "transcended"]},
+        {"question": "The author's meticulous argumentation _____ all counterarguments.", "correct": "subsumes", "options": ["subsume", "subsumes", "subsuming", "subsumed"]},
+        {"question": "His taciturn demeanor _____ a profound wisdom.", "correct": "belied", "options": ["belie", "belied", "belies", "belying"]},
+        {"question": "The exigencies of the situation _____ immediate action.", "correct": "demanded", "options": ["demand", "demanded", "demands", "demanding"]},
+        {"question": "Such egregious violations _____ severe repercussions.", "correct": "engendered", "options": ["engender", "engendered", "engenders", "engendering"]}
+      ]
+    };
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function startGame(difficulty) {
+      gameState.difficulty = difficulty;
+      gameState.currentQuestion = 0;
+      gameState.score = 0;
+      gameState.sessionCoins = 0;
+      gameState.mistakes = [];
+      gameState.gameInProgress = true;
+
+      const levelKey = difficultyMap[difficulty];
+      gameState.questionData = questionData[levelKey] || [];
+      
+      if (gameState.questionData.length === 0) {
+        alert('No questions available!');
+        return;
+      }
+
+      gameState.shuffledQuestions = shuffle(gameState.questionData).slice(0, 10);
+      document.getElementById('homeBtn').style.display = 'inline-block';
+      document.getElementById('closeBtn').style.display = 'inline-block';
+      showScreen('gameArea');
+      displayQuestion();
+      updateCoinDisplay();
+    }
+
+    function shuffle(arr) {
+      const shuffled = [...arr];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function displayQuestion() {
+      if (gameState.currentQuestion >= gameState.shuffledQuestions.length) {
+        endGame();
+        return;
+      }
+
+      const q = gameState.shuffledQuestions[gameState.currentQuestion];
+      gameState.answered = false;
+
+      document.getElementById('questionNumber').textContent = gameState.currentQuestion + 1;
+      document.getElementById('questionText').innerHTML = q.question;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('passBtn').style.display = 'none';
+
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+      
+      shuffle(q.options).forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt, q.correct);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, correct) {
+      if (gameState.answered) return;
+      gameState.answered = true;
+
+      const buttons = document.querySelectorAll('.option-btn');
+      const isCorrect = selected === correct;
+
+      buttons.forEach(btn => {
+        if (btn.textContent === correct) {
+          btn.classList.add('correct');
+        } else if (btn.textContent === selected && !isCorrect) {
+          btn.classList.add('wrong');
+        }
+        btn.disabled = true;
+      });
+
+      if (isCorrect) {
+        document.getElementById('feedback').textContent = '✅ Correct!';
+        gameState.score++;
+        gameState.sessionCoins += coinRewards[gameState.difficulty].correct;
+      } else {
+        document.getElementById('feedback').textContent = '❌ Wrong!';
+        gameState.mistakes.push({
+          question: gameState.shuffledQuestions[gameState.currentQuestion].question,
+          correct: correct,
+          selected: selected
+        });
+      }
+
+      updateCoinDisplay();
+      document.getElementById('passBtn').style.display = 'inline-block';
+    }
+
+    function passQuestion() {
+      gameState.currentQuestion++;
+      displayQuestion();
+    }
+
+    function updateCoinDisplay() {
+      document.getElementById('totalCoins').textContent = gameState.sessionCoins;
+      const max = gameState.shuffledQuestions.length * coinRewards[gameState.difficulty].correct;
+      const pct = (gameState.sessionCoins / (max || 1)) * 100;
+      document.getElementById('coinBarFill').style.width = Math.min(pct, 100) + '%';
+    }
+
+    function endGame() {
+      gameState.gameInProgress = false;
+      gameState.sessionCoins += coinRewards[gameState.difficulty].complete;
+      
+      document.getElementById('finalScore').textContent = gameState.score + ' / 10';
+      document.getElementById('coinsEarned').textContent = gameState.sessionCoins;
+      document.getElementById('currentScoreDisplay').textContent = gameState.score;
+      document.getElementById('currentCoinsDisplay').textContent = gameState.sessionCoins;
+      document.getElementById('currentDifficultyDisplay').textContent = gameState.difficulty.charAt(0).toUpperCase() + gameState.difficulty.slice(1);
+
+      if (gameState.mistakes.length > 0) {
+        document.getElementById('reviewBtnEnd').style.display = 'inline-block';
+      } else {
+        document.getElementById('reviewBtnEnd').style.display = 'none';
+      }
+
+      showScreen('endScreen');
+    }
+
+    function showReview() {
+      gameState.currentPage = 0;
+      displayReviewPage();
+      showScreen('reviewScreen');
+    }
+
+    function displayReviewPage() {
+      const items = document.getElementById('reviewItems');
+      items.innerHTML = '';
+
+      const start = gameState.currentPage * gameState.itemsPerPage;
+      const end = start + gameState.itemsPerPage;
+      const page = gameState.mistakes.slice(start, end);
+
+      page.forEach((mistake, idx) => {
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        div.innerHTML = `
+          <div class="review-item-question">❌ Q${start + idx + 1}: ${mistake.question}</div>
+          <div class="review-item-answer"><strong>Correct:</strong> ${mistake.correct}</div>
+          <div class="review-item-answer"><strong>Your answer:</strong> ${mistake.selected}</div>
+        `;
+        items.appendChild(div);
+      });
+
+      const pag = document.getElementById('pagination');
+      pag.innerHTML = '';
+      const pages = Math.ceil(gameState.mistakes.length / gameState.itemsPerPage);
+
+      for (let i = 0; i < pages; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (i === gameState.currentPage ? ' active' : '');
+        btn.textContent = i + 1;
+        btn.onclick = () => {
+          gameState.currentPage = i;
+          displayReviewPage();
+        };
+        pag.appendChild(btn);
+      }
+    }
+
+    function saveScore() {
+      const name = document.getElementById('playerName').value.trim();
+      if (!name) {
+        alert('Please enter your name!');
+        return;
+      }
+
+      const data = {
+        name: name,
+        score: gameState.score,
+        coins: gameState.sessionCoins,
+        difficulty: gameState.difficulty,
+        timestamp: new Date().toLocaleString()
+      };
+
+      let scores = JSON.parse(localStorage.getItem('channy_scores') || '[]');
+      scores.push(data);
+      scores.sort((a, b) => b.coins - a.coins);
+      scores = scores.slice(0, 10);
+      localStorage.setItem('channy_scores', JSON.stringify(scores));
+
+      alert('✅ Score saved!');
+      document.getElementById('playerName').value = '';
+      updateRankings();
+    }
+
+    function updateRankings() {
+      const scores = JSON.parse(localStorage.getItem('channy_scores') || '[]');
+      const list = document.getElementById('rankingList');
+
+      if (scores.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:#999;">No scores yet</p>';
+        return;
+      }
+
+      list.innerHTML = '';
+      scores.forEach((score, idx) => {
+        let medal = idx + 1;
+        let medalClass = '';
+        if (idx === 0) { medal = '🥇'; medalClass = 'medal-1'; }
+        else if (idx === 1) { medal = '🥈'; medalClass = 'medal-2'; }
+        else if (idx === 2) { medal = '🥉'; medalClass = 'medal-3'; }
+
+        const item = document.createElement('div');
+        item.className = 'ranking-item';
+        item.innerHTML = `
+          <div class="ranking-rank ${medalClass}">${medal}</div>
+          <div class="ranking-info">
+            <div class="ranking-name">${score.name}</div>
+            <div class="ranking-meta">${score.timestamp}</div>
+          </div>
+          <div class="ranking-coins">${score.coins} 🪙</div>
+          <div class="ranking-difficulty">${score.difficulty}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function playAgain() {
+      showScreen('startScreen');
+      document.getElementById('homeBtn').style.display = 'none';
+      document.getElementById('closeBtn').style.display = 'none';
+    }
+
+    function confirmGoHome() {
+      if (gameState.gameInProgress && !confirm('진짜 나갈거야? 진행상황이 사라져!')) return;
+      goHome();
+    }
+
+    function goHome() {
+      showScreen('startScreen');
+      gameState.gameInProgress = false;
+      document.getElementById('homeBtn').style.display = 'none';
+      document.getElementById('closeBtn').style.display = 'none';
+    }
+
+    function goToScoreBoard() {
+      updateRankings();
+      showScreen('scoreBoard');
+    }
+
+    function playAudio() {
+      alert('Audio not implemented yet');
+    }
+
+    window.addEventListener('load', () => {
+      updateRankings();
+    });
+  </script>
+</body>
+</html>
