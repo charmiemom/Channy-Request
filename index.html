@@ -1040,26 +1040,29 @@
         fill.style.width = Math.min(percentage, 100) + '%';
       }
 
-      function startGame(difficulty) {
-        gameState.difficulty = difficulty;
-        gameState.currentQuestion = 0;
-        gameState.score = 0;
-        gameState.sessionCoins = 0;
-        gameState.mistakes = [];
-        gameState.currentPage = 0;
-        gameState.gameInProgress = true;
-        const levelKey = difficultyMap[difficulty];
-        const allQuestions = questionData[levelKey];
-        gameState.shuffledQuestions = shuffleQuestionsIntelligently(allQuestions); // ← 매번 새로 셔플
-        updateCoinBar();
-        document.getElementById('totalCoins').textContent = '0';
-        document.getElementById('startScreen').classList.add('hidden');
-        document.getElementById('gameArea').classList.add('active');
-        document.getElementById('homeBtn').style.display = 'block';
-        document.getElementById('closeBtn').style.display = 'block';
-        loadQuestion();
-
-        
+  function startGame(difficulty) {
+      gameState.difficulty = difficulty;
+      gameState.currentQuestion = 0;
+      gameState.score = 0;
+      gameState.sessionCoins = 0;
+      gameState.mistakes = [];
+      gameState.currentPage = 0;
+      gameState.gameInProgress = true;
+      
+      const levelKey = difficultyMap[difficulty];
+      const allQuestions = questionData[levelKey];
+      gameState.shuffledQuestions = shuffleQuestionsIntelligently(allQuestions);
+      
+      updateCoinBar();
+      document.getElementById('totalCoins').textContent = '0';
+      
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('gameArea').classList.add('active');
+      document.getElementById('backBtn').style.display = 'block';
+      document.getElementById('closeBtn').style.display = 'block';
+      
+      loadQuestion();
+    }
 
       function loadQuestion() {
         if (gameState.currentQuestion >= 10) {
