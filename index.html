@@ -835,9 +835,10 @@
       <div class="end-buttons">
         <button class="end-btn review-btn" onclick="showReview()" id="reviewBtnEnd" style="display:none;">📋 Review Mistakes</button>
         <button class="end-btn" onclick="playAgain()">▶ Play Again</button>
-        <button class="end-btn menu-btn" onclick="goHome()">🏠 Back to Menu</button>
+        <button class="end-btn menu-btn" onclick="goToScoreBoard()">📊 Score Board</button>
       </div>
     </div>
+
 
     <div id="reviewScreen" class="screen">
       <div class="review-title">📋 Review Your Mistakes</div>
@@ -1145,7 +1146,7 @@
         }
       }
 
-      function goToScoreBoard() {
+            function goToScoreBoard() {
         if (gameState.gameInProgress) {
           gameState.gameInProgress = false;
         }
@@ -1155,8 +1156,11 @@
         document.getElementById('scoreBoard').classList.add('active');
         document.getElementById('homeBtn').style.display = 'none';
         document.getElementById('closeBtn').style.display = 'none';
+        
+        // ← 수정: 게임 중 획득한 코인 (complete 보너스 제외)
         document.getElementById('currentScoreDisplay').textContent = gameState.score;
         document.getElementById('currentCoinsDisplay').textContent = gameState.sessionCoins;
+        
         const difficultyName = {
           'sprout': 'Sprout 🌱',
           'seedling': 'Seedling 🌿',
@@ -1167,16 +1171,20 @@
         updateRankings();
       }
 
-      function saveScore() {
+            function saveScore() {
         const playerName = document.getElementById('playerName').value.trim();
         if (!playerName) {
           alert('Please enter your name');
           return;
         }
         let scores = JSON.parse(localStorage.getItem('englishQuestScores')) || [];
+        
+        // ← 수정: complete 보너스 추가해서 저장
+        const totalCoinsEarned = gameState.sessionCoins + coinRewards[gameState.difficulty].complete;
+        
         const newScore = {
           name: playerName,
-          coins: gameState.sessionCoins,
+          coins: totalCoinsEarned,  // ← complete 보너스 포함
           score: gameState.score,
           difficulty: gameState.difficulty,
           date: new Date().toLocaleString()
@@ -1238,7 +1246,7 @@
         });
       }
 
-      function endGame() {
+            function endGame() {
         gameState.gameInProgress = false;
         document.getElementById('gameArea').classList.remove('active');
         document.getElementById('endScreen').classList.add('active');
@@ -1246,12 +1254,15 @@
         document.getElementById('closeBtn').style.display = 'none';
         document.getElementById('passBtn').style.display = 'none';
         document.getElementById('finalScore').textContent = gameState.score + '/10';
-        const coinsEarned = gameState.sessionCoins + coinRewards[gameState.difficulty].complete;
-        document.getElementById('coinsEarned').textContent = coinsEarned;
+        
+        // ← 수정: sessionCoins만 표시 (이미 정답으로 누적된 코인)
+        document.getElementById('coinsEarned').textContent = gameState.sessionCoins;
+        
         if (gameState.mistakes.length > 0) {
           document.getElementById('reviewBtnEnd').style.display = 'block';
         }
       }
+
 
       function showReview() {
         document.getElementById('endScreen').classList.remove('active');
