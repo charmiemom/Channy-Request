@@ -1086,11 +1086,11 @@
         document.getElementById('passBtn').style.display = 'block';
       }
 
-      function checkAnswer(selected, correct, button) {
+function checkAnswer(selected, correct, button) {
   if (gameState.answered) return;
   gameState.answered = true;
   const isCorrect = selected === correct;
-  
+
   if (isCorrect) {
     gameState.score++;
     button.classList.add('correct');
@@ -1104,7 +1104,7 @@
       }, i * 60);
     }
     
-    // ✅ 정답이면 1초 후 자동으로 다음 문제로
+    // ✅ 정답: 1초 후 다음 문제로
     setTimeout(() => {
       gameState.currentQuestion++;
       loadQuestion();
@@ -1120,13 +1120,13 @@
       yourAnswer: selected
     });
     
-    // ❌ 오답이면 1.5초 후 자동으로 다음 문제로
+    // ❌ 오답: 1.5초 후 다음 문제로
     setTimeout(() => {
       gameState.currentQuestion++;
       loadQuestion();
     }, 1500);
   }
-  
+
   document.getElementById('totalCoins').textContent = gameState.sessionCoins;
   document.getElementById('passBtn').style.display = 'none';
 }
@@ -1187,7 +1187,7 @@ function playAudio() {
   // Web Speech API 사용 (더 안정적)
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-US';
-  utterance.rate = 1.0; 
+  utterance.rate = 0.8;  // 0.8배 속도 (더 천천히)
   utterance.pitch = 1.0;
   utterance.volume = 1.0;
   
