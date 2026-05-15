@@ -4,200 +4,781 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Channy's English Quest</title>
-  
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #a8e6cf 0%, #ffd3b6 50%, #ffaaa5 100%);
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; padding: 20px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      background: linear-gradient(135deg, #a8e6cf 0%, #ffd3b6 50%, #ffaaa5 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
     .game-container {
       background: linear-gradient(to bottom, #f0f4e8, #e8f1f5);
-      border-radius: 25px; padding: 25px; max-width: 800px; width: 100%;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.2); border: 5px solid #8b7355;
+      border-radius: 25px;
+      padding: 25px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      border: 5px solid #8b7355;
     }
+
     .header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 30px; gap: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      gap: 20px;
     }
-    .coin-display-container { display: flex; gap: 15px; align-items: center; }
+
+    .coin-display-container {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
     .total-coins {
-      font-size: 20px; font-weight: bold; color: #d4a435;
+      font-size: 20px;
+      font-weight: bold;
+      color: #d4a435;
       background: linear-gradient(135deg, #fef3c7, #fde68a);
-      padding: 12px 20px; border-radius: 12px; border: 3px solid #d4a435;
-      min-width: 120px; text-align: center;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 3px solid #d4a435;
+      min-width: 120px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
     }
+
     .coin-bar-horizontal {
-      width: 200px; height: 30px;
+      width: 200px;
+      height: 30px;
       background: linear-gradient(to right, #f0e8d8, #e8dcc8);
-      border: 3px solid #d4a574; border-radius: 15px; overflow: hidden;
+      border: 3px solid #d4a574;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.2);
       position: relative;
     }
+
     .coin-bar-fill {
-      position: absolute; left: 0; top: 0; height: 100%; width: 0%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
       background: linear-gradient(to right, #ffd700, #ffed4e);
       transition: width 0.3s ease;
+      border-right: 2px solid #d4a435;
     }
-    .header-buttons { display: flex; gap: 10px; }
+
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
     button {
-      padding: 10px 20px; border: none; border-radius: 10px;
-      font-size: 14px; font-weight: bold; cursor: pointer;
-      transition: all 0.3s; font-family: inherit;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
     }
-    .home-btn, .close-btn-header {
+
+    .home-btn,
+    .close-btn-header {
       background: linear-gradient(135deg, #8b7355, #6b5344);
-      color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    .home-btn:hover, .close-btn-header:hover {
-      transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+
+    .home-btn:hover,
+    .close-btn-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     }
-    .screen { display: none; animation: fadeIn 0.4s ease-in; }
-    .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    
-    #startScreen { text-align: center; }
-    .title { font-size: 48px; font-weight: bold; color: #6b5344; margin-bottom: 20px; }
-    .subtitle { font-size: 18px; color: #666; margin-bottom: 30px; }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .screen.hidden {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #startScreen {
+      text-align: center;
+    }
+
+    .title {
+      font-size: 48px;
+      font-weight: bold;
+      color: #6b5344;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
     .difficulty-buttons {
-      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 15px; margin-top: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
     }
+
     .difficulty-btn {
-      padding: 15px; font-size: 16px; font-weight: bold;
-      border: 3px solid transparent; border-radius: 12px;
-      cursor: pointer; transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      border: 3px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    .difficulty-btn:hover { transform: translateY(-3px); }
-    .difficulty-btn.sprout { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
-    .difficulty-btn.seedling { background: linear-gradient(135deg, #90ee90, #7fd67f); color: #2d5016; }
-    .difficulty-btn.tree { background: linear-gradient(135deg, #87ceeb, #6eb8d4); color: #1a3a52; }
-    .difficulty-btn.forest { background: linear-gradient(135deg, #dda0dd, #d88cc8); color: #4a2a4a; }
-    
+
+    .difficulty-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .difficulty-btn.sprout {
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      color: #2e7d32;
+      border-color: #66bb6a;
+    }
+
+    .difficulty-btn.sprout:hover {
+      background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+    }
+
+    .difficulty-btn.seedling {
+      background: linear-gradient(135deg, #90ee90, #7fd67f);
+      color: #2d5016;
+    }
+
+    .difficulty-btn.seedling:hover {
+      background: linear-gradient(135deg, #7fd67f, #66bb6a);
+    }
+
+    .difficulty-btn.tree {
+      background: linear-gradient(135deg, #87ceeb, #6eb8d4);
+      color: #1a3a52;
+    }
+
+    .difficulty-btn.tree:hover {
+      background: linear-gradient(135deg, #6eb8d4, #5ba3c0);
+    }
+
+    .difficulty-btn.forest {
+      background: linear-gradient(135deg, #dda0dd, #d88cc8);
+      color: #4a2a4a;
+    }
+
+    .difficulty-btn.forest:hover {
+      background: linear-gradient(135deg, #d88cc8, #cc88bb);
+    }
+
+    #gameArea.active {
+      display: block;
+    }
+
     .question-area {
-      background: white; padding: 25px; border-radius: 15px;
-      margin-bottom: 20px; border: 3px solid #e0d5c7;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      border: 3px solid #e0d5c7;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    .question-number { font-size: 14px; color: #999; margin-bottom: 10px; }
+
+    .question-number {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
     #questionText {
-      font-size: 24px; font-weight: bold; color: #333; line-height: 1.8;
-      min-height: 80px; display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      line-height: 1.8;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    .blank-underline {
+      display: inline-block;
+      border-bottom: 3px solid #333;
+      min-width: 120px;
+      margin: 0 5px;
+      padding-bottom: 5px;
+      height: 20px;
+      vertical-align: baseline;
+    }
+
     .audio-btn {
       background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white; padding: 12px 25px; border: none;
-      border-radius: 10px; font-size: 16px; font-weight: bold;
-      cursor: pointer; margin-top: 15px; transition: all 0.3s;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: all 0.3s;
     }
-    .options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+
+    .audio-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .options-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
     .option-btn {
-      padding: 18px; font-size: 18px; font-weight: bold;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: bold;
       background: linear-gradient(135deg, #f0e8d8, #e8dcc8);
-      border: 3px solid #d4a574; border-radius: 12px;
-      cursor: pointer; color: #333; transition: all 0.3s;
+      border: 3px solid #d4a574;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #333;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    .option-btn:hover:not(.correct):not(.wrong) { transform: translateY(-2px); }
-    .option-btn.correct { background: linear-gradient(135deg, #90ee90, #7fd67f); border-color: #4caf50; animation: bounce 0.6s ease; }
-    .option-btn.wrong { background: linear-gradient(135deg, #ffb6b6, #ff9999); border-color: #d32f2f; animation: shake 0.4s ease; }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-    
-    #feedback { font-size: 18px; font-weight: bold; text-align: center; height: 25px; margin-bottom: 15px; }
+
+    .option-btn:hover:not(.correct):not(.wrong) {
+      background: linear-gradient(135deg, #f5f0e8, #ede5d8);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .option-btn.correct {
+      background: linear-gradient(135deg, #90ee90, #7fd67f);
+      border-color: #4caf50;
+      color: #2d5016;
+      animation: bounce 0.6s ease;
+    }
+
+    .option-btn.wrong {
+      background: linear-gradient(135deg, #ffb6b6, #ff9999);
+      border-color: #d32f2f;
+      color: #8b0000;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    #feedback {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      height: 25px;
+      margin-bottom: 15px;
+    }
+
     .pass-btn {
-      padding: 12px 30px; font-size: 16px; font-weight: bold;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: bold;
       background: linear-gradient(135deg, #ff9800, #f57c00);
-      color: white; border: none; border-radius: 10px; cursor: pointer;
-      margin-top: 10px; width: 100%;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    
-    .end-message { font-size: 32px; font-weight: bold; color: #6b5344; margin-bottom: 20px; text-align: center; }
-    .final-score { font-size: 48px; font-weight: bold; color: #d4a435; margin: 20px 0; text-align: center; }
+
+    .pass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    #endScreen.active {
+      display: block;
+    }
+
+    .end-message {
+      font-size: 32px;
+      font-weight: bold;
+      color: #6b5344;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .final-score {
+      font-size: 48px;
+      font-weight: bold;
+      color: #d4a435;
+      margin: 20px 0;
+      text-align: center;
+    }
+
     .coins-earned {
-      font-size: 24px; color: #8b6914;
+      font-size: 24px;
+      color: #8b6914;
       background: linear-gradient(135deg, #fef3c7, #fde68a);
-      padding: 15px 25px; border-radius: 12px; margin: 20px 0;
-      border: 2px solid #d4a435; text-align: center;
+      padding: 15px 25px;
+      border-radius: 12px;
+      margin: 20px 0;
+      border: 2px solid #d4a435;
+      text-align: center;
     }
-    .end-buttons { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap; }
+
+    .end-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     .end-btn {
-      padding: 15px 30px; font-size: 18px; font-weight: bold;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
       background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white; border: none; border-radius: 12px; cursor: pointer;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
-    .review-btn { background: linear-gradient(135deg, #2196F3, #0b7dda); }
-    .menu-btn { background: linear-gradient(135deg, #8b7355, #6b5344); }
-    
-    .review-title { font-size: 28px; font-weight: bold; color: #6b5344; margin-bottom: 20px; text-align: center; }
-    .review-items { background: white; border-radius: 15px; padding: 20px; border: 3px solid #e0d5c7; max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
-    .review-item { background: linear-gradient(135deg, #f9f5f0, #f0ebe5); padding: 15px; margin-bottom: 15px; border-radius: 10px; border-left: 5px solid #d4a435; }
-    .review-item-question { font-weight: bold; color: #333; margin-bottom: 10px; font-size: 16px; }
-    .review-item-answer { font-size: 14px; color: #666; margin-bottom: 8px; }
-    .review-pagination { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+
+    .end-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .review-btn {
+      background: linear-gradient(135deg, #2196F3, #0b7dda);
+    }
+
+    .menu-btn {
+      background: linear-gradient(135deg, #8b7355, #6b5344);
+    }
+
+    #reviewScreen.active {
+      display: block;
+    }
+
+    .review-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #6b5344;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .review-items {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      border: 3px solid #e0d5c7;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .review-item {
+      background: linear-gradient(135deg, #f9f5f0, #f0ebe5);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border-left: 5px solid #d4a435;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .review-item-question {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .review-item-answer {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .review-pagination {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
     .page-btn {
-      padding: 8px 15px; background: linear-gradient(135deg, #8b7355, #6b5344);
-      color: white; border: none; border-radius: 8px; cursor: pointer;
-      font-weight: bold; transition: all 0.3s;
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #8b7355, #6b5344);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
     }
-    .page-btn.active { background: linear-gradient(135deg, #d4a435, #c49425); }
-    
+
+    .page-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .page-btn.active {
+      background: linear-gradient(135deg, #d4a435, #c49425);
+    }
+
+    #scoreBoard.active {
+      display: block;
+    }
+
     .scoreboard-container {
-      background: white; padding: 30px; border-radius: 20px;
-      border: 5px solid #8b7355; max-width: 600px; margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      border: 5px solid #8b7355;
+      max-width: 600px;
+      margin: 0 auto;
     }
+
     .scoreboard-title {
-      font-size: 36px; font-weight: bold; color: #6b5344;
-      text-align: center; margin-bottom: 25px;
+      font-size: 36px;
+      font-weight: bold;
+      color: #6b5344;
+      text-align: center;
+      margin-bottom: 25px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     .current-score {
       background: linear-gradient(135deg, #fef3c7, #fde68a);
-      padding: 15px 20px; border-radius: 12px; border: 2px solid #d4a435;
-      margin-bottom: 20px; text-align: center; font-weight: bold; color: #333;
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: 2px solid #d4a435;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+      line-height: 1.8;
     }
-    .name-input-container { display: flex; gap: 10px; margin-bottom: 20px; }
+
+    .name-input-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
     .name-input {
-      flex: 1; padding: 12px 15px; font-size: 16px;
-      border: 3px solid #d4a574; border-radius: 10px; font-family: inherit;
+      flex: 1;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 3px solid #d4a574;
+      border-radius: 10px;
+      font-family: inherit;
+      color: #333;
     }
+
+    .name-input:focus {
+      outline: none;
+      border-color: #8b7355;
+      box-shadow: 0 0 8px rgba(139, 115, 85, 0.3);
+    }
+
     .save-score-btn {
-      padding: 12px 25px; font-size: 16px; font-weight: bold;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: bold;
       background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white; border: none; border-radius: 10px; cursor: pointer; white-space: nowrap;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
     }
-    
+
+    .save-score-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
     .ranking-container {
-      background: #f9f5f0; padding: 20px; border-radius: 15px;
-      border: 2px solid #e0d5c7; margin-bottom: 20px;
+      background: #f9f5f0;
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #e0d5c7;
+      margin-bottom: 20px;
     }
-    .ranking-title { font-size: 20px; font-weight: bold; color: #6b5344; margin-bottom: 15px; text-align: center; }
-    .ranking-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+
+    .ranking-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #6b5344;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
     .ranking-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 15px; background: white; border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      background: white;
+      border-radius: 10px;
       border-left: 5px solid #d4a435;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .ranking-rank { font-size: 18px; font-weight: bold; color: #d4a435; min-width: 40px; }
-    .ranking-rank.medal-1 { color: #FFD700; }
-    .ranking-rank.medal-2 { color: #C0C0C0; }
-    .ranking-rank.medal-3 { color: #CD7F32; }
-    .ranking-info { flex: 1; margin: 0 15px; }
-    .ranking-name { font-weight: bold; color: #333; font-size: 16px; }
-    .ranking-meta { font-size: 12px; color: #999; margin-top: 3px; }
-    .ranking-coins { font-weight: bold; color: #d4a435; font-size: 16px; min-width: 80px; text-align: right; }
-    .ranking-difficulty { font-size: 12px; color: #666; background: #f0f0f0; padding: 3px 8px; border-radius: 5px; margin-left: 10px; }
-    
-    .scoreboard-buttons { display: flex; gap: 10px; margin-top: 20px; }
-    .scoreboard-buttons button { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; }
-    
+
+    .ranking-rank {
+      font-size: 18px;
+      font-weight: bold;
+      color: #d4a435;
+      min-width: 40px;
+    }
+
+    .ranking-rank.medal-1 {
+      color: #FFD700;
+      font-size: 20px;
+    }
+
+    .ranking-rank.medal-2 {
+      color: #C0C0C0;
+      font-size: 20px;
+    }
+
+    .ranking-rank.medal-3 {
+      color: #CD7F32;
+      font-size: 20px;
+    }
+
+    .ranking-info {
+      flex: 1;
+      margin: 0 15px;
+    }
+
+    .ranking-name {
+      font-weight: bold;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .ranking-meta {
+      font-size: 12px;
+      color: #999;
+      margin-top: 3px;
+    }
+
+    .ranking-coins {
+      font-weight: bold;
+      color: #d4a435;
+      font-size: 16px;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .ranking-difficulty {
+      font-size: 12px;
+      color: #666;
+      background: #f0f0f0;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+
+    .scoreboard-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .scoreboard-buttons button {
+      flex: 1;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
     @media (max-width: 600px) {
-      .difficulty-buttons { grid-template-columns: 1fr 1fr; }
-      .options-container { grid-template-columns: 1fr; }
-      .title { font-size: 32px; }
-      .end-buttons { flex-direction: column; }
-      .header { flex-direction: column; }
-      .name-input-container { flex-direction: column; }
-      .save-score-btn { width: 100%; }
+      .difficulty-buttons {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .options-container {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        font-size: 32px;
+      }
+
+      .end-buttons {
+        flex-direction: column;
+      }
+
+      .header {
+        flex-direction: column;
+      }
+
+      .scoreboard-container {
+        padding: 20px;
+      }
+
+      .scoreboard-title {
+        font-size: 28px;
+      }
+
+      .name-input-container {
+        flex-direction: column;
+      }
+
+      .save-score-btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-height: 600px) and (orientation: landscape) {
+      .game-container {
+        padding: 15px;
+        max-width: 95vw;
+      }
+
+      .title {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+      .difficulty-buttons {
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .difficulty-btn {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .header {
+        margin-bottom: 15px;
+        gap: 10px;
+      }
+
+      .coin-bar-horizontal {
+        width: 150px;
+        height: 25px;
+      }
+
+      .total-coins {
+        font-size: 16px;
+        padding: 8px 15px;
+        min-width: 100px;
+      }
+
+      .question-area {
+        padding: 15px;
+        margin-bottom: 12px;
+      }
+
+      #questionText {
+        font-size: 18px;
+        min-height: 50px;
+      }
+
+      .audio-btn {
+        padding: 8px 15px;
+        font-size: 14px;
+        margin-top: 10px;
+      }
+
+      .options-container {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .option-btn {
+        padding: 12px;
+        font-size: 16px;
+      }
+
+      #feedback {
+        font-size: 14px;
+        height: 20px;
+        margin-bottom: 10px;
+      }
+
+      .blank-underline {
+        min-width: 70px;
+        border-bottom: 2px solid #333;
+      }
+
+      .pass-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-top: 8px;
+      }
     }
   </style>
 </head>
@@ -221,10 +802,18 @@
       <div class="title">Channy's English Quest</div>
       <div class="subtitle">Choose your level</div>
       <div class="difficulty-buttons">
-        <button class="difficulty-btn sprout" onclick="startGame('sprout')">🌱 Sprout<br><small style="font-size:12px;">SR 0.7-1.2</small></button>
-        <button class="difficulty-btn seedling" onclick="startGame('seedling')">🌿 Seedling<br><small style="font-size:12px;">SR 1.3-2.2</small></button>
-        <button class="difficulty-btn tree" onclick="startGame('tree')">🌳 Tree<br><small style="font-size:12px;">SR 2.3-3.0</small></button>
-        <button class="difficulty-btn forest" onclick="startGame('forest')">🌲 Forest<br><small style="font-size:12px;">SR 3.1-3.9</small></button>
+        <button class="difficulty-btn sprout" onclick="startGame('sprout')">
+          🌱 Sprout<br><small style="font-size:12px;">SR 0.7-1.2</small>
+        </button>
+        <button class="difficulty-btn seedling" onclick="startGame('seedling')">
+          🌿 Seedling<br><small style="font-size:12px;">SR 1.3-2.2</small>
+        </button>
+        <button class="difficulty-btn tree" onclick="startGame('tree')">
+          🌳 Tree<br><small style="font-size:12px;">SR 2.3-3.0</small>
+        </button>
+        <button class="difficulty-btn forest" onclick="startGame('forest')">
+          🌲 Forest<br><small style="font-size:12px;">SR 3.1-3.9</small>
+        </button>
       </div>
     </div>
 
@@ -249,7 +838,7 @@
         <button class="end-btn menu-btn" onclick="goToScoreBoard()">📊 Score Board</button>
       </div>
     </div>
-
+    
     <div id="reviewScreen" class="screen">
       <div class="review-title">📋 Review Your Mistakes</div>
       <div class="review-items" id="reviewItems"></div>
@@ -284,377 +873,532 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    // ============ GAME STATE ============
-    let gameState = {
-      currentQuestion: 0,
-      score: 0,
-      sessionCoins: 0,
-      difficulty: 'seedling',
-      answered: false,
-      questionData: null,
-      mistakes: [],
-      currentPage: 0,
-      itemsPerPage: 3,
-      gameInProgress: false,
-      shuffledQuestions: []
-    };
+    <script>
+      let gameState = {
+        currentQuestion: 0,
+        score: 0,
+        sessionCoins: 0,
+        difficulty: 'seedling',
+        answered: false,
+        questionData: null,
+        mistakes: [],
+        currentPage: 0,
+        itemsPerPage: 3,
+        gameInProgress: false,
+        shuffledQuestions: []
+      };
 
-    // ============ COIN REWARDS ============
-    const coinRewards = {
-      sprout: { correct: 3, complete: 15 },
-      seedling: { correct: 5, complete: 20 },
-      tree: { correct: 5, complete: 20 },
-      forest: { correct: 5, complete: 20 }
-    };
+      const coinRewards = {
+        sprout: { correct: 3, complete: 15 },
+        seedling: { correct: 5, complete: 20 },
+        tree: { correct: 5, complete: 20 },
+        forest: { correct: 5, complete: 20 }
+      };
 
-    // ============ DIFFICULTY MAP ============
-    const difficultyMap = {
-      sprout: 'level_0_sr_0_7_to_1_2',
-      seedling: 'level_1_sr_1_3_to_2_2',
-      tree: 'level_2_sr_2_3_to_3_0',
-      forest: 'level_3_sr_3_1_to_3_9'
-    };
+      const questionData = {
+        "level_0_sr_0_7_to_1_2": [
+          { "question": "One cat. Two _____?", "correct": "cats", "options": ["catss", "cates", "cats", "cat"] },
+          { "question": "The dog _____ every day.", "correct": "jumps", "options": ["jumps", "jumping", "jump", "jumped"] },
+          { "question": "One pig. Two _____?", "correct": "pigs", "options": ["piges", "pigs", "pigss", "pig"] },
+          { "question": "The dog _____ every day.", "correct": "plays", "options": ["played", "playing", "play", "plays"] },
+          { "question": "One bird. Two _____?", "correct": "birds", "options": ["birdes", "birdss", "birds", "bird"] },
+          { "question": "The cat _____ on the mat.", "correct": "sits", "options": ["sit", "sitting", "sat", "sits"] },
+          { "question": "One fox. Two _____?", "correct": "foxes", "options": ["fox", "foxs", "foxes", "foxess"] },
+          { "question": "I _____ to school every day.", "correct": "go", "options": ["goes", "going", "go", "went"] },
+          { "question": "One book. Two _____?", "correct": "books", "options": ["book", "books", "bookss", "bookes"] },
+          { "question": "She _____ English.", "correct": "speaks", "options": ["speak", "speaks", "speaking", "spoke"] }
+        ],
+        "level_1_sr_1_3_to_2_2": [
+          { "question": "One child. Many _____? (Irregular plural)", "correct": "children", "options": ["children", "childs", "child", "childes"] },
+          { "question": "The rabbit _____ behind the bushes every morning.", "correct": "hides", "options": ["hid", "hide", "hides", "hiding"] },
+          { "question": "Please _____ your toys before dinner. (Phrasal verb)", "correct": "put away", "options": ["look for", "wake up", "put away", "sit down"] },
+          { "question": "One tooth. Many _____? (Irregular plural)", "correct": "teeth", "options": ["toothes", "tooth", "teeth", "tooths"] },
+          { "question": "The rabbit _____ behind the bushes every morning.", "correct": "hides", "options": ["hid", "hides", "hiding", "hide"] },
+          { "question": "Please _____ your toys before dinner. (Phrasal verb)", "correct": "put away", "options": ["put away", "wake up", "look for", "sit down"] },
+          { "question": "One mouse. Many _____? (Irregular plural)", "correct": "mice", "options": ["mice", "mouses", "mouse", "mousees"] },
+          { "question": "The rabbit _____ behind the bushes every morning.", "correct": "hides", "options": ["hiding", "hide", "hid", "hides"] },
+          { "question": "Please _____ your toys before dinner. (Phrasal verb)", "correct": "put away", "options": ["put away", "look for", "sit down", "wake up"] },
+          { "question": "One foot. Many _____? (Irregular plural)", "correct": "feet", "options": ["foots", "feet", "foot", "footes"] }
+        ],
+        "level_2_sr_2_3_to_3_0": [
+          { "question": "The owl _____ through the forest every night.", "correct": "glides", "options": ["glided", "glide", "gliding", "glides"] },
+          { "question": "The campers _____ marshmallows near the fire last night.", "correct": "roasted", "options": ["roast", "roasting", "roasts", "roasted"] },
+          { "question": "The dolphin _____ above the waves right now.", "correct": "is leaping", "options": ["leaps", "leaped", "is leaping", "leap"] },
+          { "question": "The enormous whale splashed water everywhere. What does 'enormous' mean? (Vocabulary)", "correct": "very big", "options": ["very loud", "very tiny", "very big", "very slow"] },
+          { "question": "The elephant is _____ than the dog. (Comparative adjective)", "correct": "bigger", "options": ["biggest", "more big", "bigger", "big"] },
+          { "question": "The owl _____ through the forest every night.", "correct": "glides", "options": ["glided", "glide", "glides", "gliding"] },
+          { "question": "The campers _____ marshmallows near the fire last night.", "correct": "roasted", "options": ["roasted", "roasting", "roast", "roasts"] },
+          { "question": "The dolphin _____ above the waves right now.", "correct": "is leaping", "options": ["leaped", "leap", "is leaping", "leaps"] },
+          { "question": "The enormous whale splashed water everywhere. What does 'enormous' mean? (Vocabulary)", "correct": "very big", "options": ["very tiny", "very slow", "very loud", "very big"] },
+          { "question": "The elephant is _____ than the dog. (Comparative adjective)", "correct": "bigger", "options": ["biggest", "bigger", "big", "more big"] }
+        ],
+        "level_3_sr_3_1_to_3_9": [
+          { "question": "One phenomenon. Many _____? (Irregular plural)", "correct": "phenomena", "options": ["phenomenon", "phenomenons", "phenomena", "phenomenones"] },
+          { "question": "The archaeologist _____ ancient artifacts every summer.", "correct": "excavates", "options": ["excavate", "excavating", "excavated", "excavates"] },
+          { "question": "The researchers _____ the results last night.", "correct": "analyzed", "options": ["analyzes", "analyzing", "analyze", "analyzed"] },
+          { "question": "The orchestra _____ before the concert right now.", "correct": "is rehearsing", "options": ["rehearse", "rehearses", "is rehearsing", "rehearsed"] },
+          { "question": "The intricate machine contained hundreds of tiny parts. What does 'intricate' mean? (Vocabulary)", "correct": "very detailed", "options": ["very modern", "very noisy", "very empty", "very detailed"] },
+          { "question": "One thesis. Many _____? (Irregular plural)", "correct": "theses", "options": ["thesises", "theses", "thesiss", "thesis"] },
+          { "question": "The archaeologist _____ ancient artifacts every summer.", "correct": "excavates", "options": ["excavate", "excavating", "excavates", "excavated"] },
+          { "question": "The researchers _____ the results last night.", "correct": "analyzed", "options": ["analyzing", "analyze", "analyzed", "analyzes"] },
+          { "question": "The orchestra _____ before the concert right now.", "correct": "is rehearsing", "options": ["rehearses", "rehearse", "is rehearsing", "rehearsed"] },
+          { "question": "The intricate machine contained hundreds of tiny parts. What does 'intricate' mean? (Vocabulary)", "correct": "very detailed", "options": ["very modern", "very detailed", "very empty", "very noisy"] }
+        ]
+      };
 
-    // ============ QUESTION DATA ============
-    const questionData = {
-      "level_0_sr_0_7_to_1_2": [
-        {"question": "One dog. Two _____?", "correct": "dogs", "options": ["doges", "dogs", "dog", "dogss"]},
-        {"question": "The girl _____ a book usually.", "correct": "reads", "options": ["not correct", "reads", "reading", "read"]},
-        {"question": "The duck _____ in the pond right now.", "correct": "is swimming", "options": ["is swimming", "swam", "swims", "swim"]},
-        {"question": "The boy _____ with a ball last night.", "correct": "played", "options": ["play", "playing", "plays", "played"]},
-        {"question": "The boy _____ with a ball currently.", "correct": "is playing", "options": ["played", "is playing", "plays", "play"]},
-        {"question": "One pig. Two _____?", "correct": "pigs", "options": ["pig", "pigs", "piges", "pigss"]},
-        {"question": "The dog _____ in the yard every day.", "correct": "runs", "options": ["ran", "runs", "run", "running"]},
-        {"question": "The dog _____ in the yard last night.", "correct": "ran", "options": ["running", "ran", "run", "runs"]},
-        {"question": "The frog _____ on a log currently.", "correct": "is jumping", "options": ["jumps", "jump", "jumped", "is jumping"]},
-        {"question": "The dog _____ in the yard at this moment.", "correct": "is running", "options": ["ran", "run", "runs", "is running"]}
-      ],
-      "level_1_sr_1_3_to_2_2": [
-        {"question": "She _____ to school by bus every day.", "correct": "goes", "options": ["go", "goes", "going", "went"]},
-        {"question": "They _____ a movie last night.", "correct": "watched", "options": ["watch", "watches", "watched", "watching"]},
-        {"question": "I _____ my homework right now.", "correct": "am doing", "options": ["do", "does", "am doing", "did"]},
-        {"question": "He _____ three languages fluently.", "correct": "speaks", "options": ["speak", "speaks", "speaking", "spoke"]},
-        {"question": "We _____ to the beach last summer.", "correct": "went", "options": ["go", "goes", "went", "going"]},
-        {"question": "The teacher _____ the lesson right now.", "correct": "is explaining", "options": ["explain", "explains", "is explaining", "explained"]},
-        {"question": "She _____ a beautiful dress to the party.", "correct": "wore", "options": ["wear", "wears", "wore", "wearing"]},
-        {"question": "They _____ lunch together every day.", "correct": "eat", "options": ["eat", "eats", "eating", "ate"]},
-        {"question": "I _____ this book already.", "correct": "have read", "options": ["read", "reads", "have read", "am reading"]},
-        {"question": "He _____ at the office all day tomorrow.", "correct": "will be", "options": ["is", "was", "will be", "have been"]}
-      ],
-      "level_2_sr_2_3_to_3_0": [
-        {"question": "If I _____ you, I would apologize immediately.", "correct": "were", "options": ["am", "was", "were", "have been"]},
-        {"question": "She suggested that we _____ earlier tomorrow.", "correct": "leave", "options": ["left", "leave", "leaves", "leaving"]},
-        {"question": "Despite _____ tired, he continued working.", "correct": "being", "options": ["be", "being", "been", "to be"]},
-        {"question": "The meeting _____ postponed until next week.", "correct": "has been", "options": ["has been", "have been", "is", "was"]},
-        {"question": "It's important that she _____ here on time.", "correct": "be", "options": ["is", "be", "was", "being"]},
-        {"question": "By next year, they _____ here for ten years.", "correct": "will have lived", "options": ["will live", "will have lived", "have lived", "are living"]},
-        {"question": "The report _____ completed by Friday without fail.", "correct": "must be", "options": ["must be", "must have been", "should be", "can be"]},
-        {"question": "He insists on _____ every detail explained.", "correct": "having", "options": ["have", "having", "has", "had"]},
-        {"question": "When I arrived, the concert _____ already begun.", "correct": "had", "options": ["has", "had", "have", "having"]},
-        {"question": "The strategy _____ agreed upon by all stakeholders.", "correct": "has been", "options": ["has been", "have been", "is", "will be"]}
-      ],
-      "level_3_sr_3_1_to_3_9": [
-        {"question": "The scientist's hypothesis _____ the anomaly in the data.", "correct": "elucidates", "options": ["elucidate", "elucidates", "elucidating", "elucidated"]},
-        {"question": "His obfuscation of facts only _____ the investigation.", "correct": "obfuscated", "options": ["obfuscate", "obfuscated", "obfuscates", "obfuscating"]},
-        {"question": "The inherent dichotomy _____ a fundamental paradox.", "correct": "presupposes", "options": ["presuppose", "presupposes", "presupposing", "presupposed"]},
-        {"question": "Her perspicacious observations _____ the underlying mechanisms.", "correct": "delineated", "options": ["delineate", "delineated", "delineates", "delineating"]},
-        {"question": "The cacophony of voices _____ rational discourse.", "correct": "obviated", "options": ["obviate", "obviated", "obviates", "obviating"]},
-        {"question": "Such esoteric knowledge _____ the grasp of laypeople.", "correct": "transcends", "options": ["transcend", "transcends", "transcending", "transcended"]},
-        {"question": "The author's meticulous argumentation _____ all counterarguments.", "correct": "subsumes", "options": ["subsume", "subsumes", "subsuming", "subsumed"]},
-        {"question": "His taciturn demeanor _____ a profound wisdom.", "correct": "belied", "options": ["belie", "belied", "belies", "belying"]},
-        {"question": "The exigencies of the situation _____ immediate action.", "correct": "demanded", "options": ["demand", "demanded", "demands", "demanding"]},
-        {"question": "Such egregious violations _____ severe repercussions.", "correct": "engendered", "options": ["engender", "engendered", "engenders", "engendering"]}
-      ]
-    };
+      const difficultyMap = {
+        'sprout': 'level_0_sr_0_7_to_1_2',
+        'seedling': 'level_1_sr_1_3_to_2_2',
+        'tree': 'level_2_sr_2_3_to_3_0',
+        'forest': 'level_3_sr_3_1_to_3_9'
+      };
 
-    // ============ SCREEN FUNCTIONS ============
-    function showScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
-    }
-
-    // ============ START GAME ============
-    function startGame(difficulty) {
-      gameState.difficulty = difficulty;
-      gameState.currentQuestion = 0;
-      gameState.score = 0;
-      gameState.sessionCoins = 0;
-      gameState.mistakes = [];
-      gameState.gameInProgress = true;
-
-      const levelKey = difficultyMap[difficulty];
-      gameState.questionData = questionData[levelKey] || [];
+     
       
-      if (gameState.questionData.length === 0) {
-        alert('❌ No questions available for this level!');
-        return;
-      }
-
-      gameState.shuffledQuestions = shuffleArray(gameState.questionData).slice(0, 10);
-      
-      document.getElementById('homeBtn').style.display = 'inline-block';
-      document.getElementById('closeBtn').style.display = 'inline-block';
-      
-      showScreen('gameArea');
-      displayQuestion();
-      updateCoinDisplay();
-    }
-
-    // ============ SHUFFLE ARRAY ============
-    function shuffleArray(arr) {
-      const shuffled = [...arr];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    }
-
-    // ============ DISPLAY QUESTION ============
-    function displayQuestion() {
-      if (gameState.currentQuestion >= gameState.shuffledQuestions.length) {
-        endGame();
-        return;
-      }
-
-      const q = gameState.shuffledQuestions[gameState.currentQuestion];
-      gameState.answered = false;
-
-      document.getElementById('questionNumber').textContent = gameState.currentQuestion + 1;
-      document.getElementById('questionText').innerHTML = q.question;
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('passBtn').style.display = 'none';
-
-      const container = document.getElementById('optionsContainer');
-      container.innerHTML = '';
-      
-      shuffleArray(q.options).forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = opt;
-        btn.onclick = () => checkAnswer(opt, q.correct);
-        container.appendChild(btn);
-      });
-    }
-
-    // ============ CHECK ANSWER ============
-    function checkAnswer(selected, correct) {
-      if (gameState.answered) return;
-      gameState.answered = true;
-
-      const buttons = document.querySelectorAll('.option-btn');
-      const isCorrect = selected === correct;
-
-      buttons.forEach(btn => {
-        if (btn.textContent === correct) {
-          btn.classList.add('correct');
-        } else if (btn.textContent === selected && !isCorrect) {
-          btn.classList.add('wrong');
+        function shuffleQuestionsIntelligently(questions) {
+        const shuffled = [...questions];
+        
+        // Fisher-Yates 셔플 알고리즘
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
-        btn.disabled = true;
-      });
+        
+        // ← 중복 제거 로직 추가
+        const selected = [];
+        const usedVerbs = new Set();
+        
+        for (const question of shuffled) {
+          if (selected.length >= 10) break;
+          
+          // 질문에서 핵심 단어/동사 추출
+          const keywords = extractKeywords(question.question, question.correct);
+          
+          // 이미 사용된 키워드가 있는지 확인
+          const hasConflict = keywords.some(keyword => usedVerbs.has(keyword));
+          
+          if (!hasConflict) {
+            selected.push(question);
+            keywords.forEach(keyword => usedVerbs.add(keyword));
+          }
+        }
+        
+        // 10개를 채우지 못했으면 중복 허용 (데이터 부족 시)
+        if (selected.length < 10) {
+          for (const question of shuffled) {
+            if (selected.length >= 10) break;
+            if (!selected.includes(question)) {
+              selected.push(question);
+            }
+          }
+        }
+        
+        return selected.slice(0, 10);
+      }
 
-      if (isCorrect) {
-        document.getElementById('feedback').textContent = '✅ Correct!';
-        gameState.score++;
-        gameState.sessionCoins += coinRewards[gameState.difficulty].correct;
-      } else {
-        document.getElementById('feedback').textContent = '❌ Wrong!';
+      function extractKeywords(question, correctAnswer) {
+        const keywords = [];
+        
+        // 정답에서 핵심 단어 추출
+        const correctWords = correctAnswer.toLowerCase().split(/\s+/);
+        correctWords.forEach(word => {
+          if (word.length > 2) {
+            // 동사의 원형 추출 (s, ed, ing 제거)
+            let baseWord = word
+              .replace(/s$/, '') // jumps → jump
+              .replace(/ed$/, '') // played → play
+              .replace(/ing$/, ''); // jumping → jump
+            keywords.push(baseWord);
+          }
+        });
+        
+        // 질문에서도 핵심 단어 추출
+        const questionWords = question.toLowerCase().split(/\s+/);
+        questionWords.forEach(word => {
+          if (word.length > 3 && !word.includes('_')) {
+            let baseWord = word
+              .replace(/[?.,;:!]$/, '') // 구두점 제거
+              .replace(/s$/, '')
+              .replace(/ed$/, '')
+              .replace(/ing$/, '');
+            
+            // 너무 일반적인 단어는 제외
+            if (!['the', 'one', 'many', 'what', 'does', 'mean'].includes(baseWord)) {
+              keywords.push(baseWord);
+            }
+          }
+        });
+        
+        return [...new Set(keywords)]; // 중복 제거
+      }
+
+      function updateCoinBar() {
+        const maxCoins = 50;
+        const percentage = (gameState.sessionCoins / maxCoins) * 100;
+        const fill = document.getElementById('coinBarFill');
+        fill.style.width = Math.min(percentage, 100) + '%';
+      }
+
+      function startGame(difficulty) {
+        gameState.difficulty = difficulty;
+        gameState.currentQuestion = 0;
+        gameState.score = 0;
+        gameState.sessionCoins = 0;
+        gameState.mistakes = [];
+        gameState.currentPage = 0;
+        gameState.gameInProgress = true;
+        const levelKey = difficultyMap[difficulty];
+        const allQuestions = questionData[levelKey];
+        gameState.shuffledQuestions = shuffleQuestionsIntelligently(allQuestions); // ← 매번 새로 셔플
+        updateCoinBar();
+        document.getElementById('totalCoins').textContent = '0';
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('gameArea').classList.add('active');
+        document.getElementById('homeBtn').style.display = 'block';
+        document.getElementById('closeBtn').style.display = 'block';
+        loadQuestion();
+
+        
+
+      function loadQuestion() {
+        if (gameState.currentQuestion >= 10) {
+          endGame();
+          return;
+        }
+        gameState.answered = false;
+        gameState.questionData = gameState.shuffledQuestions[gameState.currentQuestion];
+        const q = gameState.questionData;
+        const questionHTML = q.question.replace(/_+/g, '<span class="blank-underline"></span>');
+        document.getElementById('questionText').innerHTML = questionHTML;
+        document.getElementById('questionNumber').textContent = gameState.currentQuestion + 1;
+        document.getElementById('feedback').textContent = '';
+        const opts = [...q.options].sort(() => Math.random() - 0.5);
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+        opts.forEach(option => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = option;
+          btn.onclick = () => checkAnswer(option, q.correct, btn);
+          container.appendChild(btn);
+        });
+        document.getElementById('passBtn').style.display = 'block';
+      }
+
+      function checkAnswer(selected, correct, button) {
+        if (gameState.answered) return;
+        gameState.answered = true;
+        const isCorrect = selected === correct;
+        if (isCorrect) {
+          gameState.score++;
+          button.classList.add('correct');
+          document.getElementById('feedback').textContent = '✓ Correct. Great job';
+          document.getElementById('feedback').style.color = '#4caf50';
+          playSound('correct');
+          gameState.sessionCoins += coinRewards[gameState.difficulty].correct;
+          for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+              updateCoinBar();
+            }, i * 60);
+          }
+        } else {
+          button.classList.add('wrong');
+          document.getElementById('feedback').textContent = `✗ Not quite. The answer is: ${correct}`;
+          document.getElementById('feedback').style.color = '#d32f2f';
+          playSound('wrong');
+          gameState.mistakes.push({
+            question: gameState.questionData.question,
+            correct: correct,
+            yourAnswer: selected
+          });
+        }
+        document.getElementById('totalCoins').textContent = gameState.sessionCoins;
+        document.getElementById('passBtn').style.display = 'none';
+        setTimeout(() => {
+          gameState.currentQuestion++;
+          loadQuestion();
+        }, 1500);
+      }
+
+      function playSound(type) {
+        try {
+          const ctx = new(window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          if (type === 'correct') {
+            const notes = [800, 1000, 1200];
+            notes.forEach((freq, i) => {
+              setTimeout(() => {
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.15);
+              }, i * 150);
+            });
+          } else {
+            const notes = [400, 300];
+            notes.forEach((freq, i) => {
+              setTimeout(() => {
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.2);
+              }, i * 200);
+            });
+          }
+        } catch (error) {
+          console.log('Audio context error');
+        }
+      }
+
+      function playAudio() {
+        let text = gameState.questionData.question;
+        text = text.replace(/_+/g, 'blank');
+        try {
+          const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(text)}&tl=en-US`;
+          const audio = new Audio(url);
+          audio.crossOrigin = "anonymous";
+          audio.play().catch(() => speakWithWebSpeech(text));
+        } catch (error) {
+          speakWithWebSpeech(text);
+        }
+      }
+
+      function speakWithWebSpeech(text) {
+        window.speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'en-US';
+        utt.rate = 0.9;
+        utt.pitch = 1.0;
+        utt.volume = 1.0;
+        window.speechSynthesis.speak(utt);
+      }
+
+      function passQuestion() {
+        if (gameState.answered) return;
+        gameState.answered = true;
+        const q = gameState.questionData;
         gameState.mistakes.push({
-          question: gameState.shuffledQuestions[gameState.currentQuestion].question,
-          correct: correct,
-          selected: selected
+          question: gameState.questionData.question,
+          correct: q.correct,
+          yourAnswer: 'PASSED'
+        });
+        document.getElementById('feedback').textContent = '⏭️ Passed - Next question';
+        document.getElementById('feedback').style.color = '#ff9800';
+        playSound('wrong');
+        setTimeout(() => {
+          gameState.currentQuestion++;
+          loadQuestion();
+        }, 1500);
+      }
+
+      function confirmGoHome() {
+        if (confirm('Are you sure you want to go home? Your progress will be lost.')) {
+          goHome();
+        }
+      }
+
+      function goToScoreBoard() {
+
+        if (gameState.gameInProgress) {
+          gameState.gameInProgress = false;
+        }
+        document.getElementById('gameArea').classList.remove('active');
+        document.getElementById('endScreen').classList.remove('active');
+        document.getElementById('reviewScreen').classList.remove('active');
+        document.getElementById('scoreBoard').classList.add('active');
+        document.getElementById('homeBtn').style.display = 'none';
+        document.getElementById('closeBtn').style.display = 'none';
+        
+        // ← 수정: 게임 중 획득한 코인 (complete 보너스 제외)
+        document.getElementById('currentScoreDisplay').textContent = gameState.score;
+        document.getElementById('currentCoinsDisplay').textContent = gameState.sessionCoins;
+        
+        const difficultyName = {
+          'sprout': 'Sprout 🌱',
+          'seedling': 'Seedling 🌿',
+          'tree': 'Tree 🌳',
+          'forest': 'Forest 🌲'
+        };
+        document.getElementById('currentDifficultyDisplay').textContent = difficultyName[gameState.difficulty];
+        updateRankings();
+      }
+        
+      function saveScore() {
+        const playerName = document.getElementById('playerName').value.trim();
+        if (!playerName) {
+          alert('Please enter your name');
+          return;
+        }
+        let scores = JSON.parse(localStorage.getItem('englishQuestScores')) || [];
+        
+        // ← 수정: complete 보너스 추가해서 저장
+        const totalCoinsEarned = gameState.sessionCoins + coinRewards[gameState.difficulty].complete;
+        
+        const newScore = {
+          name: playerName,
+          coins: totalCoinsEarned,  // ← complete 보너스 포함
+          score: gameState.score,
+          difficulty: gameState.difficulty,
+          date: new Date().toLocaleString()
+        };
+        scores.push(newScore);
+        localStorage.setItem('englishQuestScores', JSON.stringify(scores));
+        document.getElementById('playerName').value = '';
+        updateRankings();
+        alert(`🎉 Score saved for ${playerName}!`);
+      }
+
+      function updateRankings() {
+        let scores = JSON.parse(localStorage.getItem('englishQuestScores')) || [];
+        scores.sort((a, b) => {
+          if (b.coins !== a.coins) {
+            return b.coins - a.coins;
+          }
+          return new Date(b.date) - new Date(a.date);
+        });
+        const top10 = scores.slice(0, 10);
+        const rankingList = document.getElementById('rankingList');
+        rankingList.innerHTML = '';
+        if (top10.length === 0) {
+          rankingList.innerHTML = '<p style="text-align:center; color:#999;">No scores yet</p>';
+          return;
+        }
+        top10.forEach((score, index) => {
+          const rank = index + 1;
+          let medalEmoji = '';
+          let medalClass = '';
+          if (rank === 1) {
+            medalEmoji = '🥇';
+            medalClass = 'medal-1';
+          } else if (rank === 2) {
+            medalEmoji = '🥈';
+            medalClass = 'medal-2';
+          } else if (rank === 3) {
+            medalEmoji = '🥉';
+            medalClass = 'medal-3';
+          }
+          const difficultyEmoji = {
+            'sprout': '🌱',
+            'seedling': '🌿',
+            'tree': '🌳',
+            'forest': '🌲'
+          };
+          const item = document.createElement('div');
+          item.className = 'ranking-item';
+          item.innerHTML = `
+          <div class="ranking-rank ${medalClass}">${rank}${medalEmoji}</div>
+          <div class="ranking-info">
+            <div class="ranking-name">${score.name}</div>
+            <div class="ranking-meta">${score.score}/10 | ${score.date}</div>
+          </div>
+          <div class="ranking-coins">${score.coins}</div>
+          <div class="ranking-difficulty">${difficultyEmoji[score.difficulty]}</div>
+        `;
+          rankingList.appendChild(item);
         });
       }
 
-      updateCoinDisplay();
-      document.getElementById('passBtn').style.display = 'inline-block';
-    }
-
-    // ============ PASS QUESTION ============
-    function passQuestion() {
-      gameState.currentQuestion++;
-      displayQuestion();
-    }
-
-    // ============ UPDATE COIN DISPLAY ============
-    function updateCoinDisplay() {
-      document.getElementById('totalCoins').textContent = gameState.sessionCoins;
-      const maxCoins = gameState.shuffledQuestions.length * coinRewards[gameState.difficulty].correct;
-      const percentage = (gameState.sessionCoins / (maxCoins || 1)) * 100;
-      document.getElementById('coinBarFill').style.width = Math.min(percentage, 100) + '%';
-    }
-
-    // ============ END GAME ============
-    function endGame() {
-      gameState.gameInProgress = false;
-      gameState.sessionCoins += coinRewards[gameState.difficulty].complete;
-      
-      document.getElementById('finalScore').textContent = gameState.score + ' / 10';
-      document.getElementById('coinsEarned').textContent = gameState.sessionCoins;
-      document.getElementById('currentScoreDisplay').textContent = gameState.score;
-      document.getElementById('currentCoinsDisplay').textContent = gameState.sessionCoins;
-      document.getElementById('currentDifficultyDisplay').textContent = gameState.difficulty.charAt(0).toUpperCase() + gameState.difficulty.slice(1);
-
-      if (gameState.mistakes.length > 0) {
-        document.getElementById('reviewBtnEnd').style.display = 'inline-block';
-      } else {
-        document.getElementById('reviewBtnEnd').style.display = 'none';
-      }
-
-      showScreen('endScreen');
-    }
-
-    // ============ SHOW REVIEW ============
-    function showReview() {
-      gameState.currentPage = 0;
-      displayReviewPage();
-      showScreen('reviewScreen');
-    }
-
-    function displayReviewPage() {
-      const itemsDiv = document.getElementById('reviewItems');
-      itemsDiv.innerHTML = '';
-
-      const start = gameState.currentPage * gameState.itemsPerPage;
-      const end = start + gameState.itemsPerPage;
-      const pageItems = gameState.mistakes.slice(start, end);
-
-      pageItems.forEach((mistake, index) => {
-        const div = document.createElement('div');
-        div.className = 'review-item';
-        div.innerHTML = `
-          <div class="review-item-question">❌ Q${start + index + 1}: ${mistake.question}</div>
-          <div class="review-item-answer"><strong>Correct:</strong> ${mistake.correct}</div>
-          <div class="review-item-answer"><strong>Your answer:</strong> ${mistake.selected}</div>
-        `;
-        itemsDiv.appendChild(div);
-      });
-
-      const paginationDiv = document.getElementById('pagination');
-      paginationDiv.innerHTML = '';
-      const totalPages = Math.ceil(gameState.mistakes.length / gameState.itemsPerPage);
-
-      for (let i = 0; i < totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'page-btn' + (i === gameState.currentPage ? ' active' : '');
-        btn.textContent = i + 1;
-        btn.onclick = () => {
-          gameState.currentPage = i;
-          displayReviewPage();
-        };
-        paginationDiv.appendChild(btn);
-      }
-    }
-
-    // ============ SAVE SCORE ============
-    function saveScore() {
-      const playerName = document.getElementById('playerName').value.trim();
-      
-      if (!playerName) {
-        alert('⚠️ Please enter your name!');
-        return;
-      }
-
-      const scoreData = {
-        name: playerName,
-        score: gameState.score,
-        coins: gameState.sessionCoins,
-        difficulty: gameState.difficulty,
-        timestamp: new Date().toLocaleString()
-      };
-
-      let allScores = JSON.parse(localStorage.getItem('channy_scores') || '[]');
-      allScores.push(scoreData);
-      allScores.sort((a, b) => b.coins - a.coins);
-      allScores = allScores.slice(0, 10);
-      
-      localStorage.setItem('channy_scores', JSON.stringify(allScores));
-      
-      alert('✅ Score saved successfully!');
-      document.getElementById('playerName').value = '';
-      updateRankings();
-    }
-
-    // ============ UPDATE RANKINGS ============
-    function updateRankings() {
-      const allScores = JSON.parse(localStorage.getItem('channy_scores') || '[]');
-      const rankingList = document.getElementById('rankingList');
-
-      if (allScores.length === 0) {
-        rankingList.innerHTML = '<p style="text-align:center; color:#999;">No scores yet</p>';
-        return;
-      }
-
-      rankingList.innerHTML = '';
-      allScores.forEach((score, index) => {
-        const rank = index + 1;
-        let medal = rank;
-        let medalClass = '';
+      function endGame() {
+        gameState.gameInProgress = false;
+        document.getElementById('gameArea').classList.remove('active');
+        document.getElementById('endScreen').classList.add('active');
+        document.getElementById('homeBtn').style.display = 'none';
+        document.getElementById('closeBtn').style.display = 'none';
+        document.getElementById('passBtn').style.display = 'none';
+        document.getElementById('finalScore').textContent = gameState.score + '/10';
         
-        if (rank === 1) {
-          medal = '🥇';
-          medalClass = 'medal-1';
-        } else if (rank === 2) {
-          medal = '🥈';
-          medalClass = 'medal-2';
-        } else if (rank === 3) {
-          medal = '🥉';
-          medalClass = 'medal-3';
+        // ← 수정: sessionCoins만 표시 (이미 정답으로 누적된 코인)
+        document.getElementById('coinsEarned').textContent = gameState.sessionCoins;
+        
+        if (gameState.mistakes.length > 0) {
+          document.getElementById('reviewBtnEnd').style.display = 'block';
         }
-
-        const item = document.createElement('div');
-        item.className = 'ranking-item';
-        item.innerHTML = `
-          <div class="ranking-rank ${medalClass}">${medal}</div>
-          <div class="ranking-info">
-            <div class="ranking-name">${score.name}</div>
-            <div class="ranking-meta">${score.timestamp}</div>
-          </div>
-          <div class="ranking-coins">${score.coins} 🪙</div>
-          <div class="ranking-difficulty">${score.difficulty}</div>
-        `;
-        rankingList.appendChild(item);
-      });
-    }
-
-    // ============ NAVIGATION ============
-    function playAgain() {
-      showScreen('startScreen');
-      document.getElementById('homeBtn').style.display = 'none';
-      document.getElementById('closeBtn').style.display = 'none';
-    }
-
-    function confirmGoHome() {
-      if (gameState.gameInProgress && !confirm('Are you sure? Your progress will be lost!')) {
-        return;
       }
-      goHome();
-    }
 
-    function goHome() {
-      showScreen('startScreen');
-      gameState.gameInProgress = false;
-      document.getElementById('homeBtn').style.display = 'none';
-      document.getElementById('closeBtn').style.display = 'none';
-    }
+      function showReview() {
+        document.getElementById('endScreen').classList.remove('active');
+        document.getElementById('reviewScreen').classList.add('active');
+        document.getElementById('homeBtn').style.display = 'block';
+        document.getElementById('closeBtn').style.display = 'block';
+        displayReviewPage(0);
+      }
 
-    function goToScoreBoard() {
-      updateRankings();
-      showScreen('scoreBoard');
-    }
+      function displayReviewPage(page) {
+        gameState.currentPage = page;
+        const start = page * gameState.itemsPerPage;
+        const end = start + gameState.itemsPerPage;
+        const pageItems = gameState.mistakes.slice(start, end);
+        const reviewItems = document.getElementById('reviewItems');
+        reviewItems.innerHTML = '';
+        if (pageItems.length === 0) {
+          reviewItems.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No mistakes to review</p>';
+        } else {
+          pageItems.forEach((mistake, index) => {
+            const item = document.createElement('div');
+            item.className = 'review-item';
+            item.innerHTML = `
+            <div class="review-item-question"><strong>Q${start + index + 1}:</strong> ${mistake.question}</div>
+            <div class="review-item-answer">Your answer: <span style="color:#d32f2f;">${mistake.yourAnswer}</span></div>
+            <div class="review-item-answer">Correct answer: <span style="color:#4caf50;">${mistake.correct}</span></div>
+          `;
+            reviewItems.appendChild(item);
+          });
+        }
+        const totalPages = Math.ceil(gameState.mistakes.length / gameState.itemsPerPage);
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        for (let i = 0; i < totalPages; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'page-btn' + (i === page ? ' active' : '');
+          btn.textContent = i + 1;
+          btn.onclick = () => displayReviewPage(i);
+          pagination.appendChild(btn);
+        }
+      }
 
-    function playAudio() {
-      alert('🔊 Audio feature not yet implemented');
-    }
+      function playAgain() {
+        document.getElementById('endScreen').classList.remove('active');
+        document.getElementById('reviewScreen').classList.remove('active');
+        document.getElementById('scoreBoard').classList.remove('active');
+        gameState.currentQuestion = 0;
+        gameState.score = 0;
+        gameState.mistakes = [];
+        gameState.currentPage = 0;
+        gameState.gameInProgress = true;
+        const levelKey = difficultyMap[gameState.difficulty];
+        const allQuestions = questionData[levelKey];
+        gameState.shuffledQuestions = shuffleQuestionsIntelligently(allQuestions); // ← 매번 새로 셔플
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('gameArea').classList.add('active');
+        document.getElementById('homeBtn').style.display = 'block';
+        document.getElementById('closeBtn').style.display = 'block';
+        loadQuestion();
+      }
 
-    // ============ INITIALIZE ============
-    window.addEventListener('load', () => {
-      updateRankings();
-    });
-  </script>
+      function goHome() {
+        gameState.gameInProgress = false;
+        gameState.sessionCoins = 0;
+        document.getElementById('totalCoins').textContent = '0';
+        const fill = document.getElementById('coinBarFill');
+        fill.style.width = '0%';
+        document.getElementById('startScreen').classList.remove('hidden');
+        document.getElementById('gameArea').classList.remove('active');
+        document.getElementById('endScreen').classList.remove('active');
+        document.getElementById('reviewScreen').classList.remove('active');
+        document.getElementById('scoreBoard').classList.remove('active');
+        document.getElementById('homeBtn').style.display = 'none';
+        document.getElementById('closeBtn').style.display = 'none';
+      }
+
+      document.getElementById('totalCoins').textContent = '0';
+    </script>
+  </div>
 </body>
+
 </html>
